@@ -1,0 +1,189 @@
+local quests = {
+    ["Area1Quest"] = {
+        {
+            LevelReq = 700,
+            Name = "Raider",
+            Task = { Raider = 8 },
+            Reward = { Beli = 10250, Exp = 8750000 },
+            Args = { "StartQuest", "Area1Quest", 1 }
+        },
+        {
+            LevelReq = 725,
+            Name = "Mercenary",
+            Task = { Mercenary = 8 },
+            Reward = { Beli = 10500, Exp = 9750000 },
+            Args = { "StartQuest", "Area1Quest", 2 }
+        }
+    },
+    ["Area2Quest"] = {
+        {
+            LevelReq = 775,
+            Name = "Swan Pirate",
+            Task = { ["Swan Pirate"] = 8 },
+            Reward = { Beli = 10750, Exp = 11500000 },
+            Args = { "StartQuest", "Area2Quest", 1 }
+        },
+        {
+            LevelReq = 800,
+            Name = "Factory Staff",
+            Task = { ["Factory Staff"] = 8 },
+            Reward = { Beli = 11000, Exp = 13000000 },
+            Args = { "StartQuest", "Area2Quest", 2 }
+        }
+    },
+    ["MarineQuest3"] = {
+        {
+            LevelReq = 875,
+            Name = "Marine Lieutenant",
+            Task = { ["Marine Lieutenant"] = 8 },
+            Reward = { Beli = 11250, Exp = 15000000 },
+            Args = { "StartQuest", "MarineQuest3", 1 }
+        },
+        {
+            LevelReq = 900,
+            Name = "Marine Captain",
+            Task = { ["Marine Captain"] = 9 },
+            Reward = { Beli = 11500, Exp = 16500000 },
+            Args = { "StartQuest", "MarineQuest3", 2 }
+        }
+    },
+    ["ZombieQuest"] = {
+        {
+            LevelReq = 950,
+            Name = "Zombie",
+            Task = { Zombie = 8 },
+            Reward = { Beli = 11750, Exp = 19000000 },
+            Args = { "StartQuest", "ZombieQuest", 1 }
+        },
+        {
+            LevelReq = 975,
+            Name = "Vampire",
+            Task = { Vampire = 8 },
+            Reward = { Beli = 12000, Exp = 20500000 },
+            Args = { "StartQuest", "ZombieQuest", 2 }
+        }
+    },
+    ["SnowMountainQuest"] = {
+        {
+            LevelReq = 1000,
+            Name = "Snow Trooper",
+            Task = { ["Snow Trooper"] = 8 },
+            Reward = { Beli = 12250, Exp = 22500000 },
+            Args = { "StartQuest", "SnowMountainQuest", 1 }
+        },
+        {
+            LevelReq = 1050,
+            Name = "Winter Warrior",
+            Task = { ["Winter Warrior"] = 9 },
+            Reward = { Beli = 12500, Exp = 24000000 },
+            Args = { "StartQuest", "SnowMountainQuest", 2 }
+        }
+    },
+    ["IceSideQuest"] = {
+        {
+            LevelReq = 1100,
+            Name = "Lab Subordinate",
+            Task = { ["Lab Subordinate"] = 8 },
+            Reward = { Beli = 12250, Exp = 25500000 },
+            Args = { "StartQuest", "IceSideQuest", 1 }
+        },
+        {
+            LevelReq = 1125,
+            Name = "Horned Warrior",
+            Task = { ["Horned Warrior"] = 9 },
+            Reward = { Beli = 12500, Exp = 27000000 },
+            Args = { "StartQuest", "IceSideQuest", 2 }
+        }
+    },
+    ["FireSideQuest"] = {
+        {
+            LevelReq = 1175,
+            Name = "Magma Ninja",
+            Task = { ["Magma Ninja"] = 8 },
+            Reward = { Beli = 12250, Exp = 29000000 },
+            Args = { "StartQuest", "FireSideQuest", 1 }
+        },
+        {
+            LevelReq = 1200,
+            Name = "Lava Pirate",
+            Task = { ["Lava Pirate"] = 8 },
+            Reward = { Beli = 12500, Exp = 31000000 },
+            Args = { "StartQuest", "FireSideQuest", 2 }
+        }
+    },
+    ["ShipQuest1"] = {
+        {
+            LevelReq = 1250,
+            Name = "Ship Deckhand",
+            Task = { ["Ship Deckhand"] = 8 },
+            Reward = { Beli = 12250, Exp = 33000000 },
+            Args = { "StartQuest", "ShipQuest1", 1 }
+        },
+        {
+            LevelReq = 1275,
+            Name = "Ship Engineer",
+            Task = { ["Ship Engineer"] = 8 },
+            Reward = { Beli = 12500, Exp = 35500000 },
+            Args = { "StartQuest", "ShipQuest1", 2 }
+        }
+    },
+    ["ShipQuest2"] = {
+        {
+            LevelReq = 1300,
+            Name = "Ship Steward",
+            Task = { ["Ship Steward"] = 8 },
+            Reward = { Beli = 12250, Exp = 37500000 },
+            Args = { "StartQuest", "ShipQuest2", 1 }
+        },
+        {
+            LevelReq = 1325,
+            Name = "Ship Officer",
+            Task = { ["Ship Officer"] = 8 },
+            Reward = { Beli = 12500, Exp = 39500000 },
+            Args = { "StartQuest", "ShipQuest2", 2 }
+        }
+    },
+    ["FrostQuest"] = {
+        {
+            LevelReq = 1350,
+            Name = "Arctic Warrior",
+            Task = { ["Arctic Warrior"] = 8 },
+            Reward = { Beli = 12250, Exp = 41000000 },
+            Args = { "StartQuest", "FrostQuest", 1 }
+        },
+        {
+            LevelReq = 1375,
+            Name = "Snow Lurker",
+            Task = { ["Snow Lurker"] = 8 },
+            Reward = { Beli = 12500, Exp = 43000000 },
+            Args = { "StartQuest", "FrostQuest", 2 }
+        }
+    },
+    ["ForgottenQuest"] = {
+        {
+            LevelReq = 1425,
+            Name = "Sea Soldier",
+            Task = { ["Sea Soldier"] = 8 },
+            Reward = { Beli = 12250, Exp = 47000000 },
+            Args = { "StartQuest", "ForgottenQuest", 1 }
+        },
+        {
+            LevelReq = 1450,
+            Name = "Water Fighter",
+            Task = { ["Water Fighter"] = 8 },
+            Reward = { Beli = 12500, Exp = 49000000 },
+            Args = { "StartQuest", "ForgottenQuest", 2 }
+        }
+    },
+    ["PiratePortQuest"] = {
+        {
+            LevelReq = 1500,
+            Name = "Pirate Millionaire",
+            Task = { ["Pirate Millionaire"] = 8 },
+            Reward = { Beli = 13000, Exp = 53000000 },
+            Args = { "StartQuest", "PiratePortQuest", 1 }
+        }
+    }
+}
+
+return quests
