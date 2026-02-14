@@ -1,0 +1,223 @@
+local quests = {
+    ["BanditQuest1"] = {
+        {
+            LevelReq = 0,
+            Name = "Bandits",
+            Task = { Bandit = 5 },
+            Reward = { Beli = 350, Exp = 300 },
+            Args = { "StartQuest", "BanditQuest1", 1 }
+        }
+    },
+    ["MarineQuest"] = {
+        {
+            LevelReq = 0,
+            Name = "Trainees",
+            Task = { Trainee = 5 },
+            Reward = { Beli = 350, Exp = 300 },
+            Args = { "StartQuest", "MarineQuest", 1 }
+        }
+    },
+    ["JungleQuest"] = {
+        {
+            LevelReq = 10,
+            Name = "Monkeys",
+            Task = { Monkey = 6 },
+            Reward = { Beli = 800, Exp = 2300 },
+            Args = { "StartQuest", "JungleQuest", 1 }
+        },
+        {
+            LevelReq = 15,
+            Name = "Gorillas",
+            Task = { Gorilla = 8 },
+            Reward = { Beli = 1200, Exp = 4500 },
+            Args = { "StartQuest", "JungleQuest", 2 }
+        }
+    },
+    ["BuggyQuest1"] = {
+        {
+            LevelReq = 30,
+            Name = "Pirates",
+            Task = { Pirate = 8 },
+            Reward = { Beli = 3000, Exp = 13000 },
+            Args = { "StartQuest", "BuggyQuest1", 1 }
+        },
+        {
+            LevelReq = 40,
+            Name = "Brute",
+            Task = { Brute = 8 },
+            Reward = { Beli = 3500, Exp = 22000 },
+            Args = { "StartQuest", "BuggyQuest1", 2 }
+        }
+    },
+    ["DesertQuest"] = {
+        {
+            LevelReq = 60,
+            Name = "Desert Bandit",
+            Task = { ["Desert Bandit"] = 8 },
+            Reward = { Beli = 4000, Exp = 45000 },
+            Args = { "StartQuest", "DesertQuest", 1 }
+        },
+        {
+            LevelReq = 75,
+            Name = "Desert Officer",
+            Task = { ["Desert Officer"] = 6 },
+            Reward = { Beli = 4500, Exp = 65000 },
+            Args = { "StartQuest", "DesertQuest", 2 }
+        }
+    },
+    ["SnowQuest"] = {
+        {
+            LevelReq = 90,
+            Name = "Snow Bandit",
+            Task = { ["Snow Bandit"] = 7 },
+            Reward = { Beli = 5000, Exp = 90000 },
+            Args = { "StartQuest", "SnowQuest", 1 }
+        },
+        {
+            LevelReq = 100,
+            Name = "Snowman",
+            Task = { Snowman = 8 },
+            Reward = { Beli = 5500, Exp = 150000 },
+            Args = { "StartQuest", "SnowQuest", 2 }
+        }
+    },
+    ["MarineQuest2"] = {
+        {
+            LevelReq = 120,
+            Name = "Chief Petty Officer",
+            Task = { ["Chief Petty Officer"] = 8 },
+            Reward = { Beli = 6000, Exp = 225000 },
+            Args = { "StartQuest", "MarineQuest2", 1 }
+        }
+    },
+    ["SkyQuest"] = {
+        {
+            LevelReq = 150,
+            Name = "Sky Bandit",
+            Task = { ["Sky Bandit"] = 7 },
+            Reward = { Beli = 7000, Exp = 315000 },
+            Args = { "StartQuest", "SkyQuest", 1 }
+        },
+        {
+            LevelReq = 175,
+            Name = "Dark Master",
+            Task = { ["Dark Master"] = 8 },
+            Reward = { Beli = 7500, Exp = 450000 },
+            Args = { "StartQuest", "SkyQuest", 2 }
+        }
+    },
+    ["PrisonerQuest"] = {
+        {
+            LevelReq = 190,
+            Name = "Prisoner",
+            Task = { Prisoner = 8 },
+            Reward = { Beli = 7000, Exp = 550000 },
+            Args = { "StartQuest", "PrisonerQuest", 1 }
+        },
+        {
+            LevelReq = 210,
+            Name = "Dangerous Prisoner",
+            Task = { ["Dangerous Prisoner"] = 8 },
+            Reward = { Beli = 7500, Exp = 780000 },
+            Args = { "StartQuest", "PrisonerQuest", 2 }
+        }
+    },
+    ["ColosseumQuest"] = {
+        {
+            LevelReq = 250,
+            Name = "Toga Warrior",
+            Task = { ["Toga Warrior"] = 7 },
+            Reward = { Beli = 7000, Exp = 1100000 },
+            Args = { "StartQuest", "ColosseumQuest", 1 }
+        },
+        {
+            LevelReq = 275,
+            Name = "Gladiator",
+            Task = { Gladiator = 8 },
+            Reward = { Beli = 7500, Exp = 1300000 },
+            Args = { "StartQuest", "ColosseumQuest", 2 }
+        }
+    },
+    ["MagmaQuest"] = {
+        {
+            LevelReq = 300,
+            Name = "Military Soldier",
+            Task = { ["Military Soldier"] = 7 },
+            Reward = { Beli = 8250, Exp = 1700000 },
+            Args = { "StartQuest", "MagmaQuest", 1 }
+        },
+        {
+            LevelReq = 325,
+            Name = "Military Spy",
+            Task = { ["Military Spy"] = 8 },
+            Reward = { Beli = 8500, Exp = 2000000 },
+            Args = { "StartQuest", "MagmaQuest", 2 }
+        }
+    },
+    ["FishmanQuest"] = {
+        {
+            LevelReq = 375,
+            Name = "Fishman Warrior",
+            Task = { ["Fishman Warrior"] = 8 },
+            Reward = { Beli = 8750, Exp = 3050000 },
+            Args = { "StartQuest", "FishmanQuest", 1 }
+        },
+        {
+            LevelReq = 400,
+            Name = "Fishman Commando",
+            Task = { ["Fishman Commando"] = 7 },
+            Reward = { Beli = 9000, Exp = 3350000 },
+            Args = { "StartQuest", "FishmanQuest", 2 }
+        }
+    },
+    ["SkyExp1Quest"] = {
+        {
+            LevelReq = 450,
+            Name = "God's Guard",
+            Task = { ["God's Guard"] = 7 },
+            Reward = { Beli = 8750, Exp = 4250000 },
+            Args = { "StartQuest", "SkyExp1Quest", 1 }
+        },
+        {
+            LevelReq = 475,
+            Name = "Shanda",
+            Task = { Shanda = 9 },
+            Reward = { Beli = 9000, Exp = 5000000 },
+            Args = { "StartQuest", "SkyExp1Quest", 2 }
+        }
+    },
+    ["SkyExp2Quest"] = {
+        {
+            LevelReq = 525,
+            Name = "Royal Squad",
+            Task = { ["Royal Squad"] = 8 },
+            Reward = { Beli = 9500, Exp = 5800000 },
+            Args = { "StartQuest", "SkyExp2Quest", 1 }
+        },
+        {
+            LevelReq = 550,
+            Name = "Royal Soldier",
+            Task = { ["Royal Soldier"] = 8 },
+            Reward = { Beli = 9750, Exp = 6300000 },
+            Args = { "StartQuest", "SkyExp2Quest", 2 }
+        }
+    },
+    ["FountainQuest"] = {
+        {
+            LevelReq = 625,
+            Name = "Galley Pirate",
+            Task = { ["Galley Pirate"] = 8 },
+            Reward = { Beli = 10000, Exp = 7500000 },
+            Args = { "StartQuest", "FountainQuest", 1 }
+        },
+        {
+            LevelReq = 650,
+            Name = "Galley Captain",
+            Task = { ["Galley Captain"] = 9 },
+            Reward = { Beli = 10000, Exp = 8500000 },
+            Args = { "StartQuest", "FountainQuest", 2 }
+        }
+    }
+}
+
+return quests
