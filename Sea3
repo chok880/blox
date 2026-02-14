@@ -1,0 +1,324 @@
+local quests = {
+    ["DragonCrewQuest"] = {
+        {
+            LevelReq = 1575,
+            Name = "Dragon Crew Warrior",
+            Task = { ["Dragon Crew Warrior"] = 8 },
+            Reward = { Beli = 13000, Exp = 58000000 },
+            Args = { "StartQuest", "DragonCrewQuest", 1 }
+        },
+        {
+            LevelReq = 1600,
+            Name = "Dragon Crew Archer",
+            Task = { ["Dragon Crew Archer"] = 8 },
+            Reward = { Beli = 15000, Exp = 60500000 },
+            Args = { "StartQuest", "DragonCrewQuest", 2 }
+        }
+    },
+    ["VenomCrewQuest"] = {
+        {
+            LevelReq = 1625,
+            Name = "Hydra Enforcer",
+            Task = { ["Hydra Enforcer"] = 8 },
+            Reward = { Beli = 13000, Exp = 62500000 },
+            Args = { "StartQuest", "VenomCrewQuest", 1 }
+        },
+        {
+            LevelReq = 1650,
+            Name = "Venomous Assailant",
+            Task = { ["Venomous Assailant"] = 8 },
+            Reward = { Beli = 15000, Exp = 64500000 },
+            Args = { "StartQuest", "VenomCrewQuest", 2 }
+        }
+    },
+    ["MarineTreeIsland"] = {
+        {
+            LevelReq = 1700,
+            Name = "Marine Commodore",
+            Task = { ["Marine Commodore"] = 8 },
+            Reward = { Beli = 13000, Exp = 68000000 },
+            Args = { "StartQuest", "MarineTreeIsland", 1 }
+        },
+        {
+            LevelReq = 1725,
+            Name = "Marine Rear Admiral",
+            Task = { ["Marine Rear Admiral"] = 8 },
+            Reward = { Beli = 15000, Exp = 70500000 },
+            Args = { "StartQuest", "MarineTreeIsland", 2 }
+        }
+    },
+    ["DeepForestIsland3"] = {
+        {
+            LevelReq = 1775,
+            Name = "Fishman Raider",
+            Task = { ["Fishman Raider"] = 8 },
+            Reward = { Beli = 13000, Exp = 73000000 },
+            Args = { "StartQuest", "DeepForestIsland3", 1 }
+        },
+        {
+            LevelReq = 1800,
+            Name = "Fishman Captain",
+            Task = { ["Fishman Captain"] = 8 },
+            Reward = { Beli = 15000, Exp = 75500000 },
+            Args = { "StartQuest", "DeepForestIsland3", 2 }
+        }
+    },
+    ["DeepForestIsland"] = {
+        {
+            LevelReq = 1825,
+            Name = "Forest Pirate",
+            Task = { ["Forest Pirate"] = 8 },
+            Reward = { Beli = 13000, Exp = 78000000 },
+            Args = { "StartQuest", "DeepForestIsland", 1 }
+        },
+        {
+            LevelReq = 1850,
+            Name = "Mythological Pirate",
+            Task = { ["Mythological Pirate"] = 8 },
+            Reward = { Beli = 13000, Exp = 81000000 },
+            Args = { "StartQuest", "DeepForestIsland", 2 }
+        }
+    },
+    ["DeepForestIsland2"] = {
+        {
+            LevelReq = 1900,
+            Name = "Jungle Pirate",
+            Task = { ["Jungle Pirate"] = 8 },
+            Reward = { Beli = 13000, Exp = 85000000 },
+            Args = { "StartQuest", "DeepForestIsland2", 1 }
+        },
+        {
+            LevelReq = 1925,
+            Name = "Musketeer Pirate",
+            Task = { ["Musketeer Pirate"] = 8 },
+            Reward = { Beli = 15000, Exp = 87500000 },
+            Args = { "StartQuest", "DeepForestIsland2", 2 }
+        }
+    },
+    ["HauntedQuest1"] = {
+        {
+            LevelReq = 1975,
+            Name = "Reborn Skeleton",
+            Task = { ["Reborn Skeleton"] = 8 },
+            Reward = { Beli = 13000, Exp = 91000000 },
+            Args = { "StartQuest", "HauntedQuest1", 1 }
+        },
+        {
+            LevelReq = 2000,
+            Name = "Living Zombie",
+            Task = { ["Living Zombie"] = 8 },
+            Reward = { Beli = 13250, Exp = 93500000 },
+            Args = { "StartQuest", "HauntedQuest1", 2 }
+        }
+    },
+    ["HauntedQuest2"] = {
+        {
+            LevelReq = 2025,
+            Name = "Demonic Soul",
+            Task = { ["Demonic Soul"] = 8 },
+            Reward = { Beli = 13500, Exp = 96000000 },
+            Args = { "StartQuest", "HauntedQuest2", 1 }
+        },
+        {
+            LevelReq = 2050,
+            Name = "Possessed Mummy",
+            Task = { ["Possessed Mummy"] = 8 },
+            Reward = { Beli = 13750, Exp = 98500000 },
+            Args = { "StartQuest", "HauntedQuest2", 2 }
+        }
+    },
+    ["NutsIslandQuest"] = {
+        {
+            LevelReq = 2075,
+            Name = "Peanut Scout",
+            Task = { ["Peanut Scout"] = 8 },
+            Reward = { Beli = 14000, Exp = 100000000 },
+            Args = { "StartQuest", "NutsIslandQuest", 1 }
+        },
+        {
+            LevelReq = 2100,
+            Name = "Peanut President",
+            Task = { ["Peanut President"] = 8 },
+            Reward = { Beli = 14100, Exp = 102500000 },
+            Args = { "StartQuest", "NutsIslandQuest", 2 }
+        }
+    },
+    ["IceCreamIslandQuest"] = {
+        {
+            LevelReq = 2125,
+            Name = "Ice Cream Chef",
+            Task = { ["Ice Cream Chef"] = 8 },
+            Reward = { Beli = 14200, Exp = 105000000 },
+            Args = { "StartQuest", "IceCreamIslandQuest", 1 }
+        },
+        {
+            LevelReq = 2150,
+            Name = "Ice Cream Commander",
+            Task = { ["Ice Cream Commander"] = 8 },
+            Reward = { Beli = 14300, Exp = 107500000 },
+            Args = { "StartQuest", "IceCreamIslandQuest", 2 }
+        }
+    },
+    ["CakeQuest1"] = {
+        {
+            LevelReq = 2200,
+            Name = "Cookie Crafter",
+            Task = { ["Cookie Crafter"] = 8 },
+            Reward = { Beli = 14200, Exp = 110000000 },
+            Args = { "StartQuest", "CakeQuest1", 1 }
+        },
+        {
+            LevelReq = 2225,
+            Name = "Cake Guard",
+            Task = { ["Cake Guard"] = 8 },
+            Reward = { Beli = 14300, Exp = 112500000 },
+            Args = { "StartQuest", "CakeQuest1", 2 }
+        }
+    },
+    ["CakeQuest2"] = {
+        {
+            LevelReq = 2250,
+            Name = "Baking Staff",
+            Task = { ["Baking Staff"] = 8 },
+            Reward = { Beli = 14400, Exp = 115000000 },
+            Args = { "StartQuest", "CakeQuest2", 1 }
+        },
+        {
+            LevelReq = 2275,
+            Name = "Head Baker",
+            Task = { ["Head Baker"] = 8 },
+            Reward = { Beli = 14500, Exp = 117500000 },
+            Args = { "StartQuest", "CakeQuest2", 2 }
+        }
+    },
+    ["ChocQuest1"] = {
+        {
+            LevelReq = 2300,
+            Name = "Cocoa Warrior",
+            Task = { ["Cocoa Warrior"] = 8 },
+            Reward = { Beli = 14600, Exp = 120000000 },
+            Args = { "StartQuest", "ChocQuest1", 1 }
+        },
+        {
+            LevelReq = 2325,
+            Name = "Chocolate Bar Battler",
+            Task = { ["Chocolate Bar Battler"] = 8 },
+            Reward = { Beli = 14700, Exp = 122500000 },
+            Args = { "StartQuest", "ChocQuest1", 2 }
+        }
+    },
+    ["ChocQuest2"] = {
+        {
+            LevelReq = 2350,
+            Name = "Sweet Thief",
+            Task = { ["Sweet Thief"] = 8 },
+            Reward = { Beli = 14800, Exp = 125000000 },
+            Args = { "StartQuest", "ChocQuest2", 1 }
+        },
+        {
+            LevelReq = 2375,
+            Name = "Candy Rebel",
+            Task = { ["Candy Rebel"] = 8 },
+            Reward = { Beli = 14900, Exp = 127500000 },
+            Args = { "StartQuest", "ChocQuest2", 2 }
+        }
+    },
+    ["CandyQuest1"] = {
+        {
+            LevelReq = 2400,
+            Name = "Candy Pirate",
+            Task = { ["Candy Pirate"] = 8 },
+            Reward = { Beli = 14950, Exp = 129000000 },
+            Args = { "StartQuest", "CandyQuest1", 1 }
+        },
+        {
+            LevelReq = 2425,
+            Name = "Snow Demon",
+            Task = { ["Snow Demon"] = 8 },
+            Reward = { Beli = 15000, Exp = 131000000 },
+            Args = { "StartQuest", "CandyQuest1", 2 }
+        }
+    },
+    ["TikiQuest1"] = {
+        {
+            LevelReq = 2450,
+            Name = "Isle Outlaw",
+            Task = { ["Isle Outlaw"] = 8 },
+            Reward = { Beli = 15100, Exp = 133000000 },
+            Args = { "StartQuest", "TikiQuest1", 1 }
+        },
+        {
+            LevelReq = 2475,
+            Name = "Island Boy",
+            Task = { ["Island Boy"] = 8 },
+            Reward = { Beli = 15200, Exp = 135000000 },
+            Args = { "StartQuest", "TikiQuest1", 2 }
+        }
+    },
+    ["TikiQuest2"] = {
+        {
+            LevelReq = 2500,
+            Name = "Sun-kissed Warrior",
+            Task = { ["Sun-kissed Warrior"] = 8 },
+            Reward = { Beli = 15250, Exp = 137000000 },
+            Args = { "StartQuest", "TikiQuest2", 1 }
+        },
+        {
+            LevelReq = 2525,
+            Name = "Isle Champion",
+            Task = { ["Isle Champion"] = 8 },
+            Reward = { Beli = 15300, Exp = 139000000 },
+            Args = { "StartQuest", "TikiQuest2", 2 }
+        }
+    },
+    ["TikiQuest3"] = {
+        {
+            LevelReq = 2550,
+            Name = "Serpent Hunter",
+            Task = { ["Serpent Hunter"] = 8 },
+            Reward = { Beli = 15350, Exp = 141000000 },
+            Args = { "StartQuest", "TikiQuest3", 1 }
+        },
+        {
+            LevelReq = 2575,
+            Name = "Skull Slayer",
+            Task = { ["Skull Slayer"] = 8 },
+            Reward = { Beli = 15400, Exp = 143000000 },
+            Args = { "StartQuest", "TikiQuest3", 2 }
+        }
+    },
+    ["SubmergedQuest1"] = {
+        {
+            LevelReq = 2600,
+            Name = "Reef Bandit",
+            Task = { ["Reef Bandit"] = 8 },
+            Reward = { Beli = 15450, Exp = 145000000 },
+            Args = { "StartQuest", "SubmergedQuest1", 1 }
+        },
+        {
+            LevelReq = 2625,
+            Name = "Coral Pirate",
+            Task = { ["Coral Pirate"] = 8 },
+            Reward = { Beli = 15500, Exp = 147000000 },
+            Args = { "StartQuest", "SubmergedQuest1", 2 }
+        }
+    },
+    ["SubmergedQuest2"] = {
+        {
+            LevelReq = 2650,
+            Name = "Sea Chanter",
+            Task = { ["Sea Chanter"] = 8 },
+            Reward = { Beli = 15550, Exp = 150000000 },
+            Args = { "StartQuest", "SubmergedQuest2", 1 }
+        },
+        {
+            LevelReq = 2675,
+            Name = "Ocean Prophet",
+            Task = { ["Ocean Prophet"] = 8 },
+            Reward = { Beli = 15600, Exp = 152000000 },
+            Args = { "StartQuest", "SubmergedQuest2", 2 }
+        }
+    }
+}
+
+return quests
