@@ -1,0 +1,145 @@
+-- https://github.com/BloodLetters/Ash-Libs
+local GUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/BloodLetters/Ash-Libs/refs/heads/main/source.lua"))()
+
+GUI:CreateMain({
+    Name = "Ashlabs",
+    title = "Ashlabs GUI",
+    ToggleUI = "K",
+    WindowIcon = "home", -- you can use lucid icons
+    -- WindowHeight = 600, -- default height
+    -- WindowWidth = 800, -- default width
+    Theme = {
+        Background = Color3.fromRGB(25, 25, 35),
+        Secondary = Color3.fromRGB(35, 35, 45),
+        Accent = Color3.fromRGB(138, 43, 226),
+        Text = Color3.fromRGB(255, 255, 255),
+        TextSecondary = Color3.fromRGB(180, 180, 180),
+        Border = Color3.fromRGB(50, 50, 60),
+        NavBackground = Color3.fromRGB(20, 20, 30)
+    },
+    Blur = { -- Buggy
+        Enable = false, -- transparent option
+        value = 0.2
+    },
+    Config = { -- not implemented yet
+        Enabled = false,
+    }
+})
+
+local main = GUI:CreateTab("Main", "home") -- You can use IconID we didnt impleemnt lucid or any external icons
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local player = Players.LocalPlayer
+
+-- ===== อ้างอิง Delivery =====
+local delivery = workspace:WaitForChild("JobInteractions"):WaitForChild("Delivery")
+local storePoints = delivery:WaitForChild("StorePoints")
+local rackTrigger = delivery:WaitForChild("RackTrigger")
+
+-- ===== เก็บ PROXY Prompts =====
+local prompts = {}
+
+local function scanProxy()
+    table.clear(prompts)
+    for _, obj in ipairs(workspace:GetDescendants()) do
+        if obj:IsA("BasePart") and obj.Name:sub(1, 5) == "PROXY" then
+            for _, child in ipairs(obj:GetDescendants()) do
+                if child:IsA("ProximityPrompt") then
+                    table.insert(prompts, child)
+                end
+            end
+        end
+    end
+end
+
+scanProxy()
+
+workspace.DescendantAdded:Connect(function(obj)
+    if obj:IsA("ProximityPrompt") then
+        local p = obj:FindFirstAncestorWhichIsA("BasePart")
+        if p and p.Name:sub(1, 5) == "PROXY" then
+            table.insert(prompts, obj)
+        end
+    end
+end)
+
+-- ===== วาปไปหา NPC =====
+local function teleportToNPC()
+    local character = player.Character
+    if not character then return end
+    local hrp = character:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+
+    for _, obj in ipairs(workspace:GetChildren()) do
+        if obj:IsA("Model") and string.find(obj.Name, "NPC") then
+            local npcHrp = obj:FindFirstChild("HumanoidRootPart")
+            if npcHrp then
+                hrp.CFrame = npcHrp.CFrame * CFrame.new(0, 3, -2)
+                return true
+            end
+        end
+    end
+end
+
+-- ===== วาป + กด Prompt =====
+local function teleportAndPress(prompt)
+    local character = player.Character
+    if not character then return end
+    local hrp = character:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+
+    hrp.CFrame = prompt.Parent.CFrame * CFrame.new(0, 0, -3)
+    fireproximityprompt(prompt)
+end
+
+-- ===== ตัวแปร Toggle =====
+local autoEnabled = false
+local hbConn
+
+local function startLoop()
+    if hbConn then hbConn:Disconnect() end
+    hbConn = RunService.Heartbeat:Connect(function()
+        if not autoEnabled then return end
+
+        -- 1) RackTrigger
+        local rackPrompt = rackTrigger:FindFirstChild("ProximityPrompt")
+        if rackPrompt and rackPrompt.Enabled then
+            teleportAndPress(rackPrompt)
+            return
+        end
+
+        -- 2) StorePoints
+        for _, point in ipairs(storePoints:GetChildren()) do
+            local prompt = point:FindFirstChild("ProximityPrompt")
+            if prompt and prompt.Enabled then
+                teleportAndPress(prompt)
+                return
+            end
+        end
+
+        -- 3) PROXY ทั้งแมพ (กดอย่างเดียว)
+        for i = 1, #prompts do
+            local prompt = prompts[i]
+            if prompt and prompt.Parent then
+                fireproximityprompt(prompt)
+            end
+        end
+
+        -- 4) ไม่มีอะไรให้กด → วาปไปหา NPC
+        teleportToNPC()
+    end)
+end
+
+startLoop()
+
+-- ===== ปุ่ม Toggle จาก GUI Library ของคุณ =====
+GUI:CreateToggle({
+    parent = main,
+    text = "ส่งของออโต้",
+    default = false,
+    callback = function(state)
+        autoEnabled = state
+        print("Toggle state:", state)
+    end
+})
