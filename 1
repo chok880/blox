@@ -143,3 +143,79 @@ GUI:CreateToggle({
         print("Toggle state:", state)
     end
 })
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+
+local player = Players.LocalPlayer
+local PROXY_PREFIX = "PROXY"
+local _isAutoFarm = false -- ตัวแปรเก็บสถานะ Toggle
+
+-- ฟังก์ชันหาตัวที่ใกล้ที่สุด
+local function getNearestProxy()
+    local character = player.Character
+    if not character or not character:FindFirstChild("HumanoidRootPart") then return nil end
+    
+    local rootPart = character.HumanoidRootPart
+    local nearestObject = nil
+    local minDistance = math.huge
+
+    -- ค้นหาเฉพาะใน Workspace
+    for _, object in ipairs(Workspace:GetDescendants()) do
+        if object:IsA("BasePart") and string.sub(object.Name, 1, #PROXY_PREFIX) == PROXY_PREFIX then
+            local prompt = object:FindFirstChildOfClass("ProximityPrompt")
+            
+            -- เงื่อนไข: มี Prompt + เปิดอยู่ + ระยะทางน้อยที่สุด
+            if prompt and prompt.Enabled then
+                local distance = (rootPart.Position - object.Position).Magnitude
+                if distance < minDistance then
+                    minDistance = distance
+                    nearestObject = object
+                end
+            end
+        end
+    end
+    return nearestObject
+end
+
+-- ส่วนของ GUI Toggle
+GUI:CreateToggle({
+    parent = main, 
+    text = "ออโต้เจาะ(ก้อสร้าง)", 
+    default = false, 
+    callback = function(state)
+        _isAutoFarm = state -- อัปเดตสถานะตามการกดปุ่ม
+        
+        if _isAutoFarm then
+            print("เริ่มระบบ Auto Farm...")
+            -- รัน Loop ใน Thread แยกเพื่อไม่ให้ GUI ค้าง
+            task.spawn(function()
+                while _isAutoFarm do
+                    local target = getNearestProxy()
+                    
+                    if target then
+                        local character = player.Character
+                        local prompt = target:FindFirstChildOfClass("ProximityPrompt")
+                        
+                        if character and character:FindFirstChild("HumanoidRootPart") and prompt then
+                            -- วาร์ปไปหา
+                            character:PivotTo(target.CFrame * CFrame.new(0, 3, 0))
+                            task.wait(0.2) -- รอให้ตัวละครนิ่ง
+                            
+                            -- สั่งกด
+                            prompt:InputHoldBegin()
+                            task.wait(prompt.HoldDuration)
+                            prompt:InputHoldEnd()
+                            
+                            task.wait(0.3) -- คูลดาวน์เล็กน้อยก่อนไปตัวถัดไป
+                        end
+                    else
+                        -- ถ้าไม่เจอของ ให้รอ 1 วินาทีก่อนหาใหม่ (ช่วยลดอาการกระตุก)
+                        task.wait(1)
+                    end
+                    task.wait() -- ป้องกัน Script Crash
+                end
+                print("หยุดระบบ Auto Farm")
+            end)
+        end
+    end
+})
