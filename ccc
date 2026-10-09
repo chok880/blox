@@ -1,4 +1,4 @@
--- CleanHub - Rayfield Gen2 Edition (TH/EN/RU)
+-- CleanHub 2
 
 -- ป้องกัน UI ซ้อนกัน
 if getgenv()._HUB_RAYFIELD_ACTIVE and type(getgenv()._HUB_RAYFIELD_ACTIVE.unload) == "function" then
@@ -35,11 +35,6 @@ end
 
 -- === สถานะเริ่มต้น ===
 local states = {
-    language = "English",
-    menuKey = "F1",
-    watermark = true,
-    
-    -- โมดูลเกม
     randomTPFarm = false,
     autoSell = true,
     flashVacuum = false,
@@ -51,189 +46,9 @@ local states = {
     noclip = false,
     infJump = false,
     autoRewards = false,
-    
-    -- สไลเดอร์
     flySpeed = 60,
     tpDelay = 0.05,
 }
-
--- === Localization ===
-local LOCALIZATION = {
-    English = {
-        windowTitle = "CleanHub",
-        windowSubtitle = "Rayfield Gen2 Edition",
-        
-        tabFarm = "FARM",
-        tabMagnet = "MAGNET",
-        tabVisuals = "VISUALS",
-        tabCombat = "COMBAT",
-        tabMovement = "MOVEMENT",
-        tabRewards = "REWARDS",
-        tabSettings = "SETTINGS",
-        
-        secFarm = "MAP AUTO-FARM",
-        secSell = "AUTO-SELL CONTROLLER",
-        secMagnet = "COLLECTION SYSTEMS",
-        secVisuals = "RADAR & DETECTION",
-        secCombat = "DEFENSE & COMBAT",
-        secMove = "MOBILITY MODIFIERS",
-        secRewards = "DAILY & TIMED GIFTS",
-        secPrefs = "FRAMEWORK PREFERENCES",
-        
-        toggleRandomFarm = "Auto Farm",
-        toggleAutoSell = "Auto-Sell on Full Size",
-        btnForceSell = "Force Sell Now",
-        
-        toggleFlashVacuum = "Tp to Money",
-        toggleInstantMagnet = "Money Magnet",
-        btnSweepOnce = "1-Click Full Sweep",
-        
-        togglePlayerESP = "Player Size Radar (ESP)",
-        
-        toggleAntiRagdoll = "Anti-Ragdoll (No Fall)",
-        toggleAntiGiant = "Auto-Dodge Giants",
-        
-        toggleFly = "Flight Mode (Fly)",
-        toggleNoclip = "Wall Noclip",
-        toggleInfJump = "Infinite Jump",
-        sliderFlySpeed = "Flight Speed",
-        
-        toggleAutoRewards = "Auto-Claim Timed Rewards",
-        btnClaimAllNow = "Claim All Ready Rewards",
-        
-        langBtn = "Language",
-        btnViewChangelog = "View Changelog",
-        
-        statusSellSuccess = "Size sold successfully!",
-        statusRewardsClaimed = "Rewards claimed!",
-        espEdible = "EDIBLE",
-        espDanger = "DANGER!",
-        
-        langChanged = "Language: English",
-        farmStuckWarn = "Farm stuck! Restarting in 3s...",
-        farmResumed = "Auto-Farm resumed!",
-        sweepComplete = "Sweep complete! Gathered items.",
-    },
-    Thai = {
-        windowTitle = "CleanHub",
-        windowSubtitle = "รุ่น Rayfield Gen2",
-        
-        tabFarm = "ฟาร์ม",
-        tabMagnet = "แม่เหล็ก",
-        tabVisuals = "ภาพ",
-        tabCombat = "ต่อสู้",
-        tabMovement = "การเคลื่อนที่",
-        tabRewards = "รางวัล",
-        tabSettings = "ตั้งค่า",
-        
-        secFarm = "ฟาร์มแผนที่อัตโนมัติ",
-        secSell = "ควบคุมการขายอัตโนมัติ",
-        secMagnet = "ระบบเก็บของ",
-        secVisuals = "เรดาร์ & ตรวจจับ",
-        secCombat = "ป้องกัน & ต่อสู้",
-        secMove = "ปรับแต่งการเคลื่อนที่",
-        secRewards = "ของขวัญรายวัน & ตามเวลา",
-        secPrefs = "การตั้งค่าเฟรมเวิร์ก",
-        
-        toggleRandomFarm = "ฟาร์มอัตโนมัติ",
-        toggleAutoSell = "ขายอัตโนมัติเมื่อเต็ม",
-        btnForceSell = "บังคับขายเดี๋ยวนี้",
-        
-        toggleFlashVacuum = "วาร์ปไปหาเงิน",
-        toggleInstantMagnet = "แม่เหล็กเงิน",
-        btnSweepOnce = "เก็บเงินทั้งหมดในคลิกเดียว",
-        
-        togglePlayerESP = "เรดาร์ขนาดผู้เล่น (ESP)",
-        
-        toggleAntiRagdoll = "กันหุ่นล้ม (ไม่ล้ม)",
-        toggleAntiGiant = "หลบยักษ์อัตโนมัติ",
-        
-        toggleFly = "โหมดบิน (Fly)",
-        toggleNoclip = "ทะลุกำแพง (Noclip)",
-        toggleInfJump = "กระโดดไม่จำกัด",
-        sliderFlySpeed = "ความเร็วในการบิน",
-        
-        toggleAutoRewards = "รับรางวัลตามเวลาอัตโนมัติ",
-        btnClaimAllNow = "รับรางวัลทั้งหมดที่พร้อม",
-        
-        langBtn = "ภาษา",
-        btnViewChangelog = "ดูบันทึกการเปลี่ยนแปลง",
-        
-        statusSellSuccess = "ขายขนาดสำเร็จ!",
-        statusRewardsClaimed = "รับรางวัลแล้ว!",
-        espEdible = "กินได้",
-        espDanger = "อันตราย!",
-        
-        langChanged = "ภาษา: ไทย",
-        farmStuckWarn = "ฟาร์มค้าง! กำลังรีสตาร์ทใน 3 วิ...",
-        farmResumed = "ฟาร์มอัตโนมัติเริ่มใหม่แล้ว!",
-        sweepComplete = "กวาดเสร็จ! เก็บของแล้ว",
-    },
-    Russian = {
-        windowTitle = "CleanHub",
-        windowSubtitle = "Издание Rayfield Gen2",
-        
-        tabFarm = "ФАРМ",
-        tabMagnet = "МАГНИТ",
-        tabVisuals = "ВИЗУАЛ",
-        tabCombat = "БОЙ",
-        tabMovement = "ДВИЖЕНИЕ",
-        tabRewards = "НАГРАДЫ",
-        tabSettings = "НАСТРОЙКИ",
-        
-        secFarm = "АВТО-ФАРМ КАРТЫ",
-        secSell = "УПРАВЛЕНИЕ ПРОДАЖЕЙ",
-        secMagnet = "СИСТЕМЫ СБОРА",
-        secVisuals = "РАДАР И ОБНАРУЖЕНИЕ",
-        secCombat = "ЗАЩИТА И БОЙ",
-        secMove = "МОДИФИКАТОРЫ ДВИЖЕНИЯ",
-        secRewards = "ТАЙМЕРЫ И ПОДАРКИ",
-        secPrefs = "НАСТРОЙКИ ИНТЕРФЕЙСА",
-        
-        toggleRandomFarm = "Авто фарм",
-        toggleAutoSell = "Авто-Продажа при заполнении",
-        btnForceSell = "Продать размер сейчас",
-        
-        toggleFlashVacuum = "Тп к деньгам",
-        toggleInstantMagnet = "Магнит денег",
-        btnSweepOnce = "Собрать все деньги за 1 раз",
-        
-        togglePlayerESP = "ESP Игроков (Радар веса)",
-        
-        toggleAntiRagdoll = "Анти-Рэгдолл (Без падений)",
-        toggleAntiGiant = "Авто-Уклонение от гигантов",
-        
-        toggleFly = "Режим полета (Fly)",
-        toggleNoclip = "Проход сквозь стены (Noclip)",
-        toggleInfJump = "Бесконечный прыжок",
-        sliderFlySpeed = "Скорость полета",
-        
-        toggleAutoRewards = "Авто-Сбор наград таймера",
-        btnClaimAllNow = "Забрать все готовые награды",
-        
-        langBtn = "Язык",
-        btnViewChangelog = "Посмотреть Ченджлог",
-        
-        statusSellSuccess = "Размер успешно продан!",
-        statusRewardsClaimed = "Награды собраны!",
-        espEdible = "МОЖНО СЪЕСТЬ",
-        espDanger = "ОПАСНОСТЬ!",
-        
-        langChanged = "Язык: Русский",
-        farmStuckWarn = "Фарм завис! Перезапуск на 3 сек...",
-        farmResumed = "Авто-фарм перезапущен!",
-        sweepComplete = "Сбор завершен! Предметы собраны.",
-    }
-}
-
-local LANG_ORDER = { "English", "Thai", "Russian" }
-
-local function getText(key)
-    local lang = states.language or "English"
-    return (LOCALIZATION[lang] and LOCALIZATION[lang][key])
-        or (LOCALIZATION.English and LOCALIZATION.English[key])
-        or key
-end
 
 -- === ตัวละคร ===
 local Character = player.Character or player.CharacterAdded:Wait()
@@ -314,7 +129,7 @@ local function executeSell()
 end
 
 local GROUND_KEYWORDS = {
-    "ground", "grass", "dirt", "soil", "sand", "floor", 
+    "ground", "grass", "dirt", "soil", "sand", "floor",
     "road", "path", "terrain", "base", "plate", "mud", "earth"
 }
 
@@ -464,8 +279,8 @@ end
 --                         สร้าง Rayfield Window
 -- ====================================================================
 local Window = Rayfield:CreateWindow({
-    name = getText("windowTitle"),
-    subtitle = getText("windowSubtitle"),
+    name = "ควยนิ",
+    subtitle = "V.1",
     sidebarLayout = true,
     theme = "default",
     configuration = {
@@ -474,151 +289,95 @@ local Window = Rayfield:CreateWindow({
     },
 })
 
--- เก็บ element ไว้สำหรับเปลี่ยนภาษา
-local L = {
-    tabs = {},
-    dividers = {},
-    toggles = {},
-    sliders = {},
-    buttons = {},
-    labels = {},
-}
-
--- === ฟังก์ชันรีเฟรชภาษา ===
-local function refreshLanguage()
-    -- แท็บ
-    for _, item in ipairs(L.tabs) do
-        pcall(function() item.obj:SetName(getText(item.key)) end)
-    end
-    -- Divider
-    for _, item in ipairs(L.dividers) do
-        pcall(function() item.obj:Set(getText(item.key)) end)
-    end
-    -- Toggle
-    for _, item in ipairs(L.toggles) do
-        pcall(function() item.obj:SetName(getText(item.key)) end)
-    end
-    -- Slider
-    for _, item in ipairs(L.sliders) do
-        pcall(function() item.obj:SetName(getText(item.key)) end)
-    end
-    -- Button
-    for _, item in ipairs(L.buttons) do
-        pcall(function() item.obj:SetName(getText(item.key)) end)
-    end
-    -- Label
-    for _, item in ipairs(L.labels) do
-        pcall(function() item.obj:Set(getText(item.key)) end)
-    end
-end
-
 -- ====================================================================
 --                            แท็บทั้ง 7
 -- ====================================================================
-local tabFarm = Window:CreateTab({ name = getText("tabFarm"), icon = "wheat" })
-local tabMagnet = Window:CreateTab({ name = getText("tabMagnet"), icon = "magnet" })
-local tabVisuals = Window:CreateTab({ name = getText("tabVisuals"), icon = "eye" })
-local tabCombat = Window:CreateTab({ name = getText("tabCombat"), icon = "shield" })
-local tabMovement = Window:CreateTab({ name = getText("tabMovement"), icon = "move" })
-local tabRewards = Window:CreateTab({ name = getText("tabRewards"), icon = "gift" })
-local tabSettings = Window:CreateTab({ name = getText("tabSettings"), icon = "settings" })
-
-L.tabs = {
-    {obj = tabFarm, key = "tabFarm"},
-    {obj = tabMagnet, key = "tabMagnet"},
-    {obj = tabVisuals, key = "tabVisuals"},
-    {obj = tabCombat, key = "tabCombat"},
-    {obj = tabMovement, key = "tabMovement"},
-    {obj = tabRewards, key = "tabRewards"},
-    {obj = tabSettings, key = "tabSettings"},
-}
+local tabFarm = Window:CreateTab({ name = "ฟาร์ม", icon = "wheat" })
+local tabMagnet = Window:CreateTab({ name = "แม่เหล็ก", icon = "magnet" })
+local tabVisuals = Window:CreateTab({ name = "ภาพ", icon = "eye" })
+local tabCombat = Window:CreateTab({ name = "ต่อสู้", icon = "shield" })
+local tabMovement = Window:CreateTab({ name = "การเคลื่อนที่", icon = "move" })
+local tabRewards = Window:CreateTab({ name = "รางวัล", icon = "gift" })
+local tabSettings = Window:CreateTab({ name = "ตั้งค่า", icon = "settings" })
 
 -- ====================================================================
 --                            1. แท็บฟาร์ม
 -- ====================================================================
-local divFarm = tabFarm:CreateDivider({ text = getText("secFarm") })
-L.dividers[#L.dividers+1] = {obj = divFarm, key = "secFarm"}
+tabFarm:CreateDivider({ text = "ฟาร์มแผนที่อัตโนมัติ" })
 
 local toggleFarm = tabFarm:CreateToggle({
-    name = getText("toggleRandomFarm"),
+    name = "ฟาร์มอัตโนมัติ",
     value = false,
     callback = function(val)
         states.randomTPFarm = val
         Rayfield:Notify({
-            Title = getText("toggleRandomFarm"),
-            Content = val and "ON" or "OFF",
+            Title = "ฟาร์มอัตโนมัติ",
+            Content = val and "เปิด" or "ปิด",
             Duration = 2,
         })
     end,
 })
-L.toggles[#L.toggles+1] = {obj = toggleFarm, key = "toggleRandomFarm"}
 
-local divSell = tabFarm:CreateDivider({ text = getText("secSell") })
-L.dividers[#L.dividers+1] = {obj = divSell, key = "secSell"}
+tabFarm:CreateDivider({ text = "ควบคุมการขายอัตโนมัติ" })
 
 local toggleSell = tabFarm:CreateToggle({
-    name = getText("toggleAutoSell"),
+    name = "ขายอัตโนมัติเมื่อเต็ม",
     value = true,
     callback = function(val)
         states.autoSell = val
         Rayfield:Notify({
-            Title = getText("toggleAutoSell"),
-            Content = val and "ON" or "OFF",
+            Title = "ขายอัตโนมัติ",
+            Content = val and "เปิด" or "ปิด",
             Duration = 2,
         })
     end,
 })
-L.toggles[#L.toggles+1] = {obj = toggleSell, key = "toggleAutoSell"}
 
-local btnSell = tabFarm:CreateButton({
-    name = getText("btnForceSell"),
+tabFarm:CreateButton({
+    name = "บังคับขายเดี๋ยวนี้",
     callback = function()
         executeSell()
         Rayfield:Notify({
-            Title = getText("statusSellSuccess"),
+            Title = "ขายขนาดสำเร็จ!",
             Content = "",
             Duration = 2,
         })
     end,
 })
-L.buttons[#L.buttons+1] = {obj = btnSell, key = "btnForceSell"}
 
 -- ====================================================================
 --                            2. แท็บแม่เหล็ก
 -- ====================================================================
-local divMag = tabMagnet:CreateDivider({ text = getText("secMagnet") })
-L.dividers[#L.dividers+1] = {obj = divMag, key = "secMagnet"}
+tabMagnet:CreateDivider({ text = "ระบบเก็บของ" })
 
 local toggleVacuum = tabMagnet:CreateToggle({
-    name = getText("toggleFlashVacuum"),
+    name = "วาร์ปไปหาเงิน",
     value = false,
     callback = function(val)
         states.flashVacuum = val
         Rayfield:Notify({
-            Title = getText("toggleFlashVacuum"),
-            Content = val and "ON" or "OFF",
+            Title = "วาร์ปไปหาเงิน",
+            Content = val and "เปิด" or "ปิด",
             Duration = 2,
         })
     end,
 })
-L.toggles[#L.toggles+1] = {obj = toggleVacuum, key = "toggleFlashVacuum"}
 
 local toggleMag = tabMagnet:CreateToggle({
-    name = getText("toggleInstantMagnet"),
+    name = "แม่เหล็กเงิน",
     value = false,
     callback = function(val)
         states.instantMagnet = val
         Rayfield:Notify({
-            Title = getText("toggleInstantMagnet"),
-            Content = val and "ON" or "OFF",
+            Title = "แม่เหล็กเงิน",
+            Content = val and "เปิด" or "ปิด",
             Duration = 2,
         })
     end,
 })
-L.toggles[#L.toggles+1] = {obj = toggleMag, key = "toggleInstantMagnet"}
 
-local btnSweep = tabMagnet:CreateButton({
-    name = getText("btnSweepOnce"),
+tabMagnet:CreateButton({
+    name = "เก็บเงินทั้งหมดในคลิกเดียว",
     callback = function()
         task.spawn(function()
             local dropsList = getPrioritizedDrops()
@@ -639,120 +398,110 @@ local btnSweep = tabMagnet:CreateButton({
                 HumanoidRootPart.CFrame = startCF
                 HumanoidRootPart.AssemblyLinearVelocity = Vector3.zero
                 Rayfield:Notify({
-                    Title = getText("sweepComplete"),
-                    Content = "",
+                    Title = "กวาดเสร็จ!",
+                    Content = "เก็บของทั้งหมดแล้ว",
                     Duration = 2,
                 })
             end
         end)
     end,
 })
-L.buttons[#L.buttons+1] = {obj = btnSweep, key = "btnSweepOnce"}
 
 -- ====================================================================
 --                            3. แท็บภาพ
 -- ====================================================================
-local divVis = tabVisuals:CreateDivider({ text = getText("secVisuals") })
-L.dividers[#L.dividers+1] = {obj = divVis, key = "secVisuals"}
+tabVisuals:CreateDivider({ text = "เรดาร์ & ตรวจจับ" })
 
 local toggleESP = tabVisuals:CreateToggle({
-    name = getText("togglePlayerESP"),
+    name = "เรดาร์ขนาดผู้เล่น (ESP)",
     value = false,
     callback = function(val)
         states.playerESP = val
         Rayfield:Notify({
-            Title = getText("togglePlayerESP"),
-            Content = val and "ON" or "OFF",
+            Title = "เรดาร์ผู้เล่น",
+            Content = val and "เปิด" or "ปิด",
             Duration = 2,
         })
     end,
 })
-L.toggles[#L.toggles+1] = {obj = toggleESP, key = "togglePlayerESP"}
 
 -- ====================================================================
 --                            4. แท็บต่อสู้
 -- ====================================================================
-local divCom = tabCombat:CreateDivider({ text = getText("secCombat") })
-L.dividers[#L.dividers+1] = {obj = divCom, key = "secCombat"}
+tabCombat:CreateDivider({ text = "ป้องกัน & ต่อสู้" })
 
 local toggleRagdoll = tabCombat:CreateToggle({
-    name = getText("toggleAntiRagdoll"),
+    name = "กันหุ่นล้ม (ไม่ล้ม)",
     value = false,
     callback = function(val)
         states.antiRagdoll = val
         Rayfield:Notify({
-            Title = getText("toggleAntiRagdoll"),
-            Content = val and "ON" or "OFF",
+            Title = "กันหุ่นล้ม",
+            Content = val and "เปิด" or "ปิด",
             Duration = 2,
         })
     end,
 })
-L.toggles[#L.toggles+1] = {obj = toggleRagdoll, key = "toggleAntiRagdoll"}
 
 local toggleGiant = tabCombat:CreateToggle({
-    name = getText("toggleAntiGiant"),
+    name = "หลบยักษ์อัตโนมัติ",
     value = false,
     callback = function(val)
         states.antiGiant = val
         Rayfield:Notify({
-            Title = getText("toggleAntiGiant"),
-            Content = val and "ON" or "OFF",
+            Title = "หลบยักษ์",
+            Content = val and "เปิด" or "ปิด",
             Duration = 2,
         })
     end,
 })
-L.toggles[#L.toggles+1] = {obj = toggleGiant, key = "toggleAntiGiant"}
 
 -- ====================================================================
 --                            5. แท็บการเคลื่อนที่
 -- ====================================================================
-local divMove = tabMovement:CreateDivider({ text = getText("secMove") })
-L.dividers[#L.dividers+1] = {obj = divMove, key = "secMove"}
+tabMovement:CreateDivider({ text = "ปรับแต่งการเคลื่อนที่" })
 
 local toggleFly = tabMovement:CreateToggle({
-    name = getText("toggleFly"),
+    name = "โหมดบิน (Fly)",
     value = false,
     callback = function(val)
         states.fly = val
         Rayfield:Notify({
-            Title = getText("toggleFly"),
-            Content = val and "ON" or "OFF",
+            Title = "โหมดบิน",
+            Content = val and "เปิด (WASD + Space/Shift)" or "ปิด",
             Duration = 2,
         })
     end,
 })
-L.toggles[#L.toggles+1] = {obj = toggleFly, key = "toggleFly"}
 
 local toggleNoclip = tabMovement:CreateToggle({
-    name = getText("toggleNoclip"),
+    name = "ทะลุกำแพง (Noclip)",
     value = false,
     callback = function(val)
         states.noclip = val
         Rayfield:Notify({
-            Title = getText("toggleNoclip"),
-            Content = val and "ON" or "OFF",
+            Title = "ทะลุกำแพง",
+            Content = val and "เปิด" or "ปิด",
             Duration = 2,
         })
     end,
 })
-L.toggles[#L.toggles+1] = {obj = toggleNoclip, key = "toggleNoclip"}
 
 local toggleJump = tabMovement:CreateToggle({
-    name = getText("toggleInfJump"),
+    name = "กระโดดไม่จำกัด",
     value = false,
     callback = function(val)
         states.infJump = val
         Rayfield:Notify({
-            Title = getText("toggleInfJump"),
-            Content = val and "ON" or "OFF",
+            Title = "กระโดดไม่จำกัด",
+            Content = val and "เปิด" or "ปิด",
             Duration = 2,
         })
     end,
 })
-L.toggles[#L.toggles+1] = {obj = toggleJump, key = "toggleInfJump"}
 
-local sliderSpeed = tabMovement:CreateSlider({
-    name = getText("sliderFlySpeed"),
+tabMovement:CreateSlider({
+    name = "ความเร็วในการบิน",
     range = { 16, 200 },
     increment = 2,
     value = 60,
@@ -761,85 +510,59 @@ local sliderSpeed = tabMovement:CreateSlider({
         states.flySpeed = val
     end,
 })
-L.sliders[#L.sliders+1] = {obj = sliderSpeed, key = "sliderFlySpeed"}
 
 -- ====================================================================
 --                            6. แท็บรางวัล
 -- ====================================================================
-local divRew = tabRewards:CreateDivider({ text = getText("secRewards") })
-L.dividers[#L.dividers+1] = {obj = divRew, key = "secRewards"}
+tabRewards:CreateDivider({ text = "ของขวัญรายวัน & ตามเวลา" })
 
 local toggleRewards = tabRewards:CreateToggle({
-    name = getText("toggleAutoRewards"),
+    name = "รับรางวัลตามเวลาอัตโนมัติ",
     value = false,
     callback = function(val)
         states.autoRewards = val
         Rayfield:Notify({
-            Title = getText("toggleAutoRewards"),
-            Content = val and "ON" or "OFF",
+            Title = "รับรางวัลอัตโนมัติ",
+            Content = val and "เปิด" or "ปิด",
             Duration = 2,
         })
     end,
 })
-L.toggles[#L.toggles+1] = {obj = toggleRewards, key = "toggleAutoRewards"}
 
-local btnClaim = tabRewards:CreateButton({
-    name = getText("btnClaimAllNow"),
+tabRewards:CreateButton({
+    name = "รับรางวัลทั้งหมดที่พร้อม",
     callback = function()
         claimTimedRewards()
         Rayfield:Notify({
-            Title = getText("statusRewardsClaimed"),
+            Title = "รับรางวัลแล้ว!",
             Content = "",
             Duration = 2,
         })
     end,
 })
-L.buttons[#L.buttons+1] = {obj = btnClaim, key = "btnClaimAllNow"}
 
 -- ====================================================================
 --                            7. แท็บตั้งค่า
 -- ====================================================================
-local divPrefs = tabSettings:CreateDivider({ text = getText("secPrefs") })
-L.dividers[#L.dividers+1] = {obj = divPrefs, key = "secPrefs"}
+tabSettings:CreateDivider({ text = "การตั้งค่า" })
 
--- ปุ่มเปลี่ยนภาษา (วน 3 ภาษา)
-local langDropdown = tabSettings:CreateDropdown({
-    name = getText("langBtn"),
-    options = { "English", "ไทย", "Русский" },
-    currentOption = { "English" },
-    callback = function(opt)
-        local val = type(opt) == "table" and opt[1] or opt
-        if val == "ไทย" then states.language = "Thai"
-        elseif val == "Русский" then states.language = "Russian"
-        else states.language = "English" end
-        refreshLanguage()
-        Rayfield:Notify({
-            Title = getText("langChanged"),
-            Content = "",
-            Duration = 2,
-        })
-    end,
-})
-
-local btnChangelog = tabSettings:CreateButton({
-    name = getText("btnViewChangelog"),
-    callback = function()
-        Rayfield:Notify({
-            Title = "v5.0 Master",
-            Content = "• ลบ auto-purchase ตามคำขอ\n• Flash Vacuum จัดลำดับ TimeLeft\n• แก้ timed reward + lucky wheel\n• Random TP หันหน้าเป้าหมายก่อนเก็บ\n• Auto-Sell sync กับ WarningText\n• รองรับ 3 ภาษา (EN/TH/RU)",
-            Duration = 8,
-        })
-    end,
-})
-L.buttons[#L.buttons+1] = {obj = btnChangelog, key = "btnViewChangelog"}
-
--- Keybind เปิด/ปิดเมนู
-local keybind = tabSettings:CreateKeybind({
-    name = "Menu Keybind",
+tabSettings:CreateKeybind({
+    name = "ปุ่มเปิด/ปิดเมนู",
     currentKeybind = "F1",
     holdToInteract = false,
     callback = function(key)
-        states.menuKey = key
+        -- Rayfield จัดการปุ่มเอง
+    end,
+})
+
+tabSettings:CreateButton({
+    name = "ดูบันทึกการเปลี่ยนแปลง",
+    callback = function()
+        Rayfield:Notify({
+            Title = "v5.0 - Rayfield Gen2",
+            Content = "• ลบ auto-purchase ตามคำขอ\n• Flash Vacuum จัดลำดับ TimeLeft\n• แก้ timed reward + lucky wheel\n• Random TP หันหน้าเป้าหมายก่อนเก็บ\n• Auto-Sell sync กับ WarningText\n• UI ภาษาไทยล้วน ใช้ Rayfield Gen2",
+            Duration = 8,
+        })
     end,
 })
 
@@ -866,8 +589,8 @@ task.spawn(function()
 
             if os.clock() - lastActivityTime >= 10 then
                 Rayfield:Notify({
-                    Title = getText("farmStuckWarn"),
-                    Content = "",
+                    Title = "ฟาร์มค้าง!",
+                    Content = "กำลังรีสตาร์ทใน 3 วิ...",
                     Duration = 3,
                 })
                 states.randomTPFarm = false
@@ -891,7 +614,7 @@ task.spawn(function()
                     pcall(function() toggleFarm:Set(true) end)
                     lastActivityTime = os.clock()
                     Rayfield:Notify({
-                        Title = getText("farmResumed"),
+                        Title = "ฟาร์มเริ่มใหม่แล้ว!",
                         Content = "",
                         Duration = 3,
                     })
@@ -1126,10 +849,10 @@ task.spawn(function()
                         txt.TextSize = 11
                         if targetPhys < myPhys then
                             txt.TextColor3 = Color3.fromRGB(0, 255, 120)
-                            txt.Text = p.Name .. " [" .. getText("espEdible") .. "]\nน้ำหนัก: " .. math.floor(targetPhys * 10) / 10
+                            txt.Text = p.Name .. " [กินได้]\nน้ำหนัก: " .. math.floor(targetPhys * 10) / 10
                         else
                             txt.TextColor3 = Color3.fromRGB(255, 60, 60)
-                            txt.Text = p.Name .. " [" .. getText("espDanger") .. "]\nน้ำหนัก: " .. math.floor(targetPhys * 10) / 10
+                            txt.Text = p.Name .. " [อันตราย!]\nน้ำหนัก: " .. math.floor(targetPhys * 10) / 10
                         end
                         txt.Parent = bg
                     end
@@ -1253,7 +976,7 @@ getgenv()._HUB_RAYFIELD_ACTIVE = {
 }
 
 Rayfield:Notify({
-    Title = getText("windowTitle"),
-    Content = "โหลดแล้ว! กด " .. states.menuKey .. " เพื่อเปิด/ปิดเมนู",
+    Title = "CleanHub",
+    Content = "โหลดแล้ว! กด F1 เพื่อเปิด/ปิดเมนู",
     Duration = 4,
 })
