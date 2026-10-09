@@ -1,8 +1,8 @@
--- CleanHub 2
+-- CleanHub - Ashlabs GUI Edition (ภาษาไทย)
 
 -- ป้องกัน UI ซ้อนกัน
-if getgenv()._HUB_RAYFIELD_ACTIVE and type(getgenv()._HUB_RAYFIELD_ACTIVE.unload) == "function" then
-    pcall(getgenv()._HUB_RAYFIELD_ACTIVE.unload)
+if getgenv()._HUB_ASH_ACTIVE and type(getgenv()._HUB_ASH_ACTIVE.unload) == "function" then
+    pcall(getgenv()._HUB_ASH_ACTIVE.unload)
     task.wait(0.15)
 end
 
@@ -11,7 +11,6 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local TweenService = game:GetService("TweenService")
 local Workspace = game:GetService("Workspace")
 local VirtualUser = game:GetService("VirtualUser")
 
@@ -19,21 +18,45 @@ local player = Players.LocalPlayer or Players.PlayerAdded:Wait()
 local Camera = Workspace.CurrentCamera or Workspace:FindFirstChildOfClass("Camera")
 local isTouchDevice = UserInputService.TouchEnabled
 
--- === Rayfield ===
-local Rayfield
+-- === Ashlabs GUI ===
+local GUI
 do
     local ok, lib = pcall(function()
-        return loadstring(game:HttpGet("https://sirius.menu/gen2"))()
+        return loadstring(game:HttpGet("https://raw.githubusercontent.com/BloodLetters/Ash-Libs/refs/heads/main/source.lua"))()
     end)
-    if ok and type(lib) == "table" and type(lib.CreateWindow) == "function" then
-        Rayfield = lib
+    if ok and type(lib) == "table" then
+        GUI = lib
     else
-        warn("[CleanHub] Rayfield Gen2 โหลดล้มเหลว: " .. tostring(lib))
+        warn("[CleanHub] Ashlabs โหลดล้มเหลว: " .. tostring(lib))
         return
     end
 end
 
--- === สถานะเริ่มต้น ===
+-- === สร้างหน้าต่างหลัก ===
+GUI:CreateMain({
+    Name = "CleanHub",
+    title = "CleanHub - ตัวช่วยฟาร์ม",
+    ToggleUI = "K",
+    WindowIcon = "home",
+    Theme = {
+        Background = Color3.fromRGB(25, 25, 35),
+        Secondary = Color3.fromRGB(35, 35, 45),
+        Accent = Color3.fromRGB(138, 43, 226),
+        Text = Color3.fromRGB(255, 255, 255),
+        TextSecondary = Color3.fromRGB(180, 180, 180),
+        Border = Color3.fromRGB(50, 50, 60),
+        NavBackground = Color3.fromRGB(20, 20, 30)
+    },
+    Blur = {
+        Enable = false,
+        value = 0.2
+    },
+    Config = {
+        Enabled = false,
+    }
+})
+
+-- === สถานะ ===
 local states = {
     randomTPFarm = false,
     autoSell = true,
@@ -276,108 +299,95 @@ local function claimTimedRewards()
 end
 
 -- ====================================================================
---                         สร้าง Rayfield Window
+--                            แท็บต่างๆ
 -- ====================================================================
-local Window = Rayfield:CreateWindow({
-    name = "ควยนิ",
-    subtitle = "V.1",
-    sidebarLayout = true,
-    theme = "default",
-    configuration = {
-        autoSave = false,
-        autoLoad = false,
-    },
-})
-
--- ====================================================================
---                            แท็บทั้ง 7
--- ====================================================================
-local tabFarm = Window:CreateTab({ name = "ฟาร์ม", icon = "wheat" })
-local tabMagnet = Window:CreateTab({ name = "แม่เหล็ก", icon = "magnet" })
-local tabVisuals = Window:CreateTab({ name = "ภาพ", icon = "eye" })
-local tabCombat = Window:CreateTab({ name = "ต่อสู้", icon = "shield" })
-local tabMovement = Window:CreateTab({ name = "การเคลื่อนที่", icon = "move" })
-local tabRewards = Window:CreateTab({ name = "รางวัล", icon = "gift" })
-local tabSettings = Window:CreateTab({ name = "ตั้งค่า", icon = "settings" })
+local tabFarm = GUI:CreateTab("ฟาร์ม", "home")
+local tabMagnet = GUI:CreateTab("แม่เหล็ก", "magnet")
+local tabVisuals = GUI:CreateTab("ภาพ", "eye")
+local tabCombat = GUI:CreateTab("ต่อสู้", "shield")
+local tabMovement = GUI:CreateTab("การเคลื่อนที่", "move")
+local tabRewards = GUI:CreateTab("รางวัล", "gift")
+local tabSettings = GUI:CreateTab("ตั้งค่า", "settings")
 
 -- ====================================================================
 --                            1. แท็บฟาร์ม
 -- ====================================================================
-tabFarm:CreateDivider({ text = "ฟาร์มแผนที่อัตโนมัติ" })
+GUI:CreateSection({ parent = tabFarm, text = "ฟาร์มแผนที่อัตโนมัติ" })
 
-local toggleFarm = tabFarm:CreateToggle({
-    name = "ฟาร์มอัตโนมัติ",
-    value = false,
-    callback = function(val)
-        states.randomTPFarm = val
-        Rayfield:Notify({
-            Title = "ฟาร์มอัตโนมัติ",
-            Content = val and "เปิด" or "ปิด",
-            Duration = 2,
+GUI:CreateToggle({
+    parent = tabFarm,
+    text = "ฟาร์มอัตโนมัติ",
+    default = false,
+    callback = function(state)
+        states.randomTPFarm = state
+        GUI:CreateNotify({
+            title = "ฟาร์มอัตโนมัติ",
+            description = state and "เปิดใช้งานแล้ว" or "ปิดใช้งานแล้ว"
         })
-    end,
+    end
 })
 
-tabFarm:CreateDivider({ text = "ควบคุมการขายอัตโนมัติ" })
+GUI:CreateSection({ parent = tabFarm, text = "ควบคุมการขายอัตโนมัติ" })
 
-local toggleSell = tabFarm:CreateToggle({
-    name = "ขายอัตโนมัติเมื่อเต็ม",
-    value = true,
-    callback = function(val)
-        states.autoSell = val
-        Rayfield:Notify({
-            Title = "ขายอัตโนมัติ",
-            Content = val and "เปิด" or "ปิด",
-            Duration = 2,
+GUI:CreateToggle({
+    parent = tabFarm,
+    text = "ขายอัตโนมัติเมื่อเต็ม",
+    default = true,
+    callback = function(state)
+        states.autoSell = state
+        GUI:CreateNotify({
+            title = "ขายอัตโนมัติ",
+            description = state and "เปิดใช้งานแล้ว" or "ปิดใช้งานแล้ว"
         })
-    end,
+    end
 })
 
-tabFarm:CreateButton({
-    name = "บังคับขายเดี๋ยวนี้",
+GUI:CreateButton({
+    parent = tabFarm,
+    text = "บังคับขายเดี๋ยวนี้",
     callback = function()
         executeSell()
-        Rayfield:Notify({
-            Title = "ขายขนาดสำเร็จ!",
-            Content = "",
-            Duration = 2,
+        GUI:CreateNotify({
+            title = "ขายสำเร็จ",
+            description = "ขายขนาดของคุณเรียบร้อยแล้ว!"
         })
-    end,
+    end
 })
 
 -- ====================================================================
 --                            2. แท็บแม่เหล็ก
 -- ====================================================================
-tabMagnet:CreateDivider({ text = "ระบบเก็บของ" })
+GUI:CreateSection({ parent = tabMagnet, text = "ระบบเก็บของ" })
 
-local toggleVacuum = tabMagnet:CreateToggle({
-    name = "วาร์ปไปหาเงิน",
-    value = false,
-    callback = function(val)
-        states.flashVacuum = val
-        Rayfield:Notify({
-            Title = "วาร์ปไปหาเงิน",
-            Content = val and "เปิด" or "ปิด",
-            Duration = 2,
+GUI:CreateToggle({
+    parent = tabMagnet,
+    text = "วาร์ปไปหาเงิน",
+    default = false,
+    callback = function(state)
+        states.flashVacuum = state
+        GUI:CreateNotify({
+            title = "วาร์ปไปหาเงิน",
+            description = state and "เปิดใช้งานแล้ว" or "ปิดใช้งานแล้ว"
         })
-    end,
+    end
 })
 
-local toggleMag = tabMagnet:CreateToggle({
-    name = "แม่เหล็กเงิน",
-    value = false,
-    callback = function(val)
-        states.instantMagnet = val
-        Rayfield:Notify({
-            Title = "แม่เหล็กเงิน",
-            Content = val and "เปิด" or "ปิด",
-            Duration = 2,
+GUI:CreateToggle({
+    parent = tabMagnet,
+    text = "แม่เหล็กเงิน",
+    default = false,
+    callback = function(state)
+        states.instantMagnet = state
+        GUI:CreateNotify({
+            title = "แม่เหล็กเงิน",
+            description = state and "เปิดใช้งานแล้ว" or "ปิดใช้งานแล้ว"
         })
-    end,
+    end
 })
 
-tabMagnet:CreateButton({
-    name = "เก็บเงินทั้งหมดในคลิกเดียว",
+GUI:CreateButton({
+    parent = tabMagnet,
+    text = "เก็บเงินทั้งหมดในคลิกเดียว",
     callback = function()
         task.spawn(function()
             local dropsList = getPrioritizedDrops()
@@ -397,173 +407,211 @@ tabMagnet:CreateButton({
                 end
                 HumanoidRootPart.CFrame = startCF
                 HumanoidRootPart.AssemblyLinearVelocity = Vector3.zero
-                Rayfield:Notify({
-                    Title = "กวาดเสร็จ!",
-                    Content = "เก็บของทั้งหมดแล้ว",
-                    Duration = 2,
+                GUI:CreateNotify({
+                    title = "กวาดเสร็จ!",
+                    description = "เก็บของทั้งหมดเรียบร้อยแล้ว"
+                })
+            else
+                GUI:CreateNotify({
+                    title = "ไม่มีของให้เก็บ",
+                    description = "ไม่พบไอเทมในระยะที่เก็บได้"
                 })
             end
         end)
-    end,
+    end
 })
 
 -- ====================================================================
 --                            3. แท็บภาพ
 -- ====================================================================
-tabVisuals:CreateDivider({ text = "เรดาร์ & ตรวจจับ" })
+GUI:CreateSection({ parent = tabVisuals, text = "เรดาร์ & ตรวจจับ" })
 
-local toggleESP = tabVisuals:CreateToggle({
-    name = "เรดาร์ขนาดผู้เล่น (ESP)",
-    value = false,
-    callback = function(val)
-        states.playerESP = val
-        Rayfield:Notify({
-            Title = "เรดาร์ผู้เล่น",
-            Content = val and "เปิด" or "ปิด",
-            Duration = 2,
+GUI:CreateToggle({
+    parent = tabVisuals,
+    text = "เรดาร์ขนาดผู้เล่น (ESP)",
+    default = false,
+    callback = function(state)
+        states.playerESP = state
+        GUI:CreateNotify({
+            title = "เรดาร์ผู้เล่น",
+            description = state and "เปิดใช้งานแล้ว" or "ปิดใช้งานแล้ว"
         })
-    end,
+    end
+})
+
+GUI:CreateParagraph({
+    parent = tabVisuals,
+    text = "แสดงชื่อผู้เล่น ขนาดตัว และสถานะ (กินได้ / อันตราย) เหนือหัวผู้เล่นทุกคนในเซิร์ฟเวอร์"
 })
 
 -- ====================================================================
 --                            4. แท็บต่อสู้
 -- ====================================================================
-tabCombat:CreateDivider({ text = "ป้องกัน & ต่อสู้" })
+GUI:CreateSection({ parent = tabCombat, text = "ป้องกัน & ต่อสู้" })
 
-local toggleRagdoll = tabCombat:CreateToggle({
-    name = "กันหุ่นล้ม (ไม่ล้ม)",
-    value = false,
-    callback = function(val)
-        states.antiRagdoll = val
-        Rayfield:Notify({
-            Title = "กันหุ่นล้ม",
-            Content = val and "เปิด" or "ปิด",
-            Duration = 2,
+GUI:CreateToggle({
+    parent = tabCombat,
+    text = "กันหุ่นล้ม (ไม่ล้ม)",
+    default = false,
+    callback = function(state)
+        states.antiRagdoll = state
+        GUI:CreateNotify({
+            title = "กันหุ่นล้ม",
+            description = state and "เปิดใช้งานแล้ว" or "ปิดใช้งานแล้ว"
         })
-    end,
+    end
 })
 
-local toggleGiant = tabCombat:CreateToggle({
-    name = "หลบยักษ์อัตโนมัติ",
-    value = false,
-    callback = function(val)
-        states.antiGiant = val
-        Rayfield:Notify({
-            Title = "หลบยักษ์",
-            Content = val and "เปิด" or "ปิด",
-            Duration = 2,
+GUI:CreateToggle({
+    parent = tabCombat,
+    text = "หลบยักษ์อัตโนมัติ",
+    default = false,
+    callback = function(state)
+        states.antiGiant = state
+        GUI:CreateNotify({
+            title = "หลบยักษ์",
+            description = state and "เปิดใช้งานแล้ว" or "ปิดใช้งานแล้ว"
         })
-    end,
+    end
+})
+
+GUI:CreateParagraph({
+    parent = tabCombat,
+    text = "หลบยักษ์: เมื่อมีผู้เล่นที่ตัวใหญ่กว่าอยู่ในระยะ 30 สตั๊ด ระบบจะวาร์ปคุณหนีขึ้นฟ้าทันที"
 })
 
 -- ====================================================================
 --                            5. แท็บการเคลื่อนที่
 -- ====================================================================
-tabMovement:CreateDivider({ text = "ปรับแต่งการเคลื่อนที่" })
+GUI:CreateSection({ parent = tabMovement, text = "ปรับแต่งการเคลื่อนที่" })
 
-local toggleFly = tabMovement:CreateToggle({
-    name = "โหมดบิน (Fly)",
-    value = false,
-    callback = function(val)
-        states.fly = val
-        Rayfield:Notify({
-            Title = "โหมดบิน",
-            Content = val and "เปิด (WASD + Space/Shift)" or "ปิด",
-            Duration = 2,
+GUI:CreateToggle({
+    parent = tabMovement,
+    text = "โหมดบิน (Fly)",
+    default = false,
+    callback = function(state)
+        states.fly = state
+        GUI:CreateNotify({
+            title = "โหมดบิน",
+            description = state and "เปิด - ใช้ WASD + Space/Shift ในการบิน" or "ปิดใช้งานแล้ว"
         })
-    end,
+    end
 })
 
-local toggleNoclip = tabMovement:CreateToggle({
-    name = "ทะลุกำแพง (Noclip)",
-    value = false,
-    callback = function(val)
-        states.noclip = val
-        Rayfield:Notify({
-            Title = "ทะลุกำแพง",
-            Content = val and "เปิด" or "ปิด",
-            Duration = 2,
+GUI:CreateToggle({
+    parent = tabMovement,
+    text = "ทะลุกำแพง (Noclip)",
+    default = false,
+    callback = function(state)
+        states.noclip = state
+        GUI:CreateNotify({
+            title = "ทะลุกำแพง",
+            description = state and "เปิดใช้งานแล้ว" or "ปิดใช้งานแล้ว"
         })
-    end,
+    end
 })
 
-local toggleJump = tabMovement:CreateToggle({
-    name = "กระโดดไม่จำกัด",
-    value = false,
-    callback = function(val)
-        states.infJump = val
-        Rayfield:Notify({
-            Title = "กระโดดไม่จำกัด",
-            Content = val and "เปิด" or "ปิด",
-            Duration = 2,
+GUI:CreateToggle({
+    parent = tabMovement,
+    text = "กระโดดไม่จำกัด",
+    default = false,
+    callback = function(state)
+        states.infJump = state
+        GUI:CreateNotify({
+            title = "กระโดดไม่จำกัด",
+            description = state and "เปิดใช้งานแล้ว" or "ปิดใช้งานแล้ว"
         })
-    end,
+    end
 })
 
-tabMovement:CreateSlider({
-    name = "ความเร็วในการบิน",
-    range = { 16, 200 },
-    increment = 2,
-    value = 60,
-    suffix = "",
-    callback = function(val)
-        states.flySpeed = val
-    end,
+GUI:CreateSlider({
+    parent = tabMovement,
+    text = "ความเร็วในการบิน",
+    min = 16,
+    max = 200,
+    default = 60,
+    callback = function(value)
+        states.flySpeed = value
+    end
 })
 
 -- ====================================================================
 --                            6. แท็บรางวัล
 -- ====================================================================
-tabRewards:CreateDivider({ text = "ของขวัญรายวัน & ตามเวลา" })
+GUI:CreateSection({ parent = tabRewards, text = "ของขวัญรายวัน & ตามเวลา" })
 
-local toggleRewards = tabRewards:CreateToggle({
-    name = "รับรางวัลตามเวลาอัตโนมัติ",
-    value = false,
-    callback = function(val)
-        states.autoRewards = val
-        Rayfield:Notify({
-            Title = "รับรางวัลอัตโนมัติ",
-            Content = val and "เปิด" or "ปิด",
-            Duration = 2,
+GUI:CreateToggle({
+    parent = tabRewards,
+    text = "รับรางวัลตามเวลาอัตโนมัติ",
+    default = false,
+    callback = function(state)
+        states.autoRewards = state
+        GUI:CreateNotify({
+            title = "รับรางวัลอัตโนมัติ",
+            description = state and "เปิดใช้งานแล้ว" or "ปิดใช้งานแล้ว"
         })
-    end,
+    end
 })
 
-tabRewards:CreateButton({
-    name = "รับรางวัลทั้งหมดที่พร้อม",
+GUI:CreateButton({
+    parent = tabRewards,
+    text = "รับรางวัลทั้งหมดที่พร้อม",
     callback = function()
         claimTimedRewards()
-        Rayfield:Notify({
-            Title = "รับรางวัลแล้ว!",
-            Content = "",
-            Duration = 2,
+        GUI:CreateNotify({
+            title = "รับรางวัลแล้ว!",
+            description = "รางวัลทั้งหมดที่พร้อมถูกเก็บเรียบร้อย"
         })
-    end,
+    end
 })
 
 -- ====================================================================
 --                            7. แท็บตั้งค่า
 -- ====================================================================
-tabSettings:CreateDivider({ text = "การตั้งค่า" })
+GUI:CreateSection({ parent = tabSettings, text = "การตั้งค่า" })
 
-tabSettings:CreateKeybind({
-    name = "ปุ่มเปิด/ปิดเมนู",
-    currentKeybind = "F1",
-    holdToInteract = false,
-    callback = function(key)
-        -- Rayfield จัดการปุ่มเอง
-    end,
+GUI:CreateKeyBind({
+    parent = tabSettings,
+    text = "ปุ่มเปิด/ปิดเมนู",
+    default = "K",
+    callback = function(key, input, isPressed)
+        if isPressed then
+            -- Ashlabs จัดการ toggle UI ให้เองผ่านค่า ToggleUI ใน CreateMain
+        end
+    end
 })
 
-tabSettings:CreateButton({
-    name = "ดูบันทึกการเปลี่ยนแปลง",
+GUI:CreateDivider({ parent = tabSettings })
+
+GUI:CreateButton({
+    parent = tabSettings,
+    text = "ดูบันทึกการเปลี่ยนแปลง",
     callback = function()
-        Rayfield:Notify({
-            Title = "v5.0 - Rayfield Gen2",
-            Content = "• ลบ auto-purchase ตามคำขอ\n• Flash Vacuum จัดลำดับ TimeLeft\n• แก้ timed reward + lucky wheel\n• Random TP หันหน้าเป้าหมายก่อนเก็บ\n• Auto-Sell sync กับ WarningText\n• UI ภาษาไทยล้วน ใช้ Rayfield Gen2",
-            Duration = 8,
+        GUI:CreateNotify({
+            title = "v5.0 - Ashlabs Edition",
+            content = "• เปลี่ยนมาใช้ Ashlabs GUI",
+            description = [[
+เวอร์ชันล่าสุด:
+• เปลี่ยน UI เป็น Ashlabs GUI ทั้งหมด
+• UI ภาษาไทยล้วน
+• Flash Vacuum จัดลำดับ TimeLeft + ระยะทาง
+• แก้ timed reward + lucky wheel
+• Random TP หันหน้าเป้าหมายก่อนเก็บ
+• Auto-Sell sync กับ WarningText
+• Watchdog ฟาร์มค้าง 10 วิ → รีสตาร์ท 3 วิ
+            ]]
         })
-    end,
+    end
+})
+
+GUI:CreateButton({
+    parent = tabSettings,
+    text = "ปิดเมนู (Unload)",
+    callback = function()
+        if getgenv()._HUB_ASH_ACTIVE and type(getgenv()._HUB_ASH_ACTIVE.unload) == "function" then
+            getgenv()._HUB_ASH_ACTIVE.unload()
+        end
+    end
 })
 
 -- ====================================================================
@@ -574,8 +622,13 @@ local function addConn(c) table.insert(Runtime.connections, c) end
 
 -- 1. Random TP Auto-Farm + Watchdog
 task.spawn(function()
-    local localGrab = ReplicatedStorage:WaitForChild("LocalEvents"):WaitForChild("Grab")
-    local localEat = ReplicatedStorage:WaitForChild("LocalEvents"):WaitForChild("Eat")
+    local ok, localGrab = pcall(function()
+        return ReplicatedStorage:WaitForChild("LocalEvents"):WaitForChild("Grab")
+    end)
+    local ok2, localEat = pcall(function()
+        return ReplicatedStorage:WaitForChild("LocalEvents"):WaitForChild("Eat")
+    end)
+    if not ok or not ok2 then return end
 
     local lastActivityTime = os.clock()
     local wasFarming = false
@@ -588,13 +641,11 @@ task.spawn(function()
             end
 
             if os.clock() - lastActivityTime >= 10 then
-                Rayfield:Notify({
-                    Title = "ฟาร์มค้าง!",
-                    Content = "กำลังรีสตาร์ทใน 3 วิ...",
-                    Duration = 3,
+                GUI:CreateNotify({
+                    title = "ฟาร์มค้าง!",
+                    description = "กำลังรีสตาร์ทใน 3 วินาที..."
                 })
                 states.randomTPFarm = false
-                pcall(function() toggleFarm:Set(false) end)
 
                 local char = player.Character
                 if char then
@@ -611,12 +662,10 @@ task.spawn(function()
 
                 if Runtime.running then
                     states.randomTPFarm = true
-                    pcall(function() toggleFarm:Set(true) end)
                     lastActivityTime = os.clock()
-                    Rayfield:Notify({
-                        Title = "ฟาร์มเริ่มใหม่แล้ว!",
-                        Content = "",
-                        Duration = 3,
+                    GUI:CreateNotify({
+                        title = "ฟาร์มเริ่มใหม่แล้ว!",
+                        description = "ระบบกลับมาทำงานปกติ"
                     })
                 end
             end
@@ -963,7 +1012,7 @@ end))
 -- ====================================================================
 --                            Unload
 -- ====================================================================
-getgenv()._HUB_RAYFIELD_ACTIVE = {
+getgenv()._HUB_ASH_ACTIVE = {
     unload = function()
         Runtime.running = false
         for _, c in ipairs(Runtime.connections) do
@@ -972,11 +1021,11 @@ getgenv()._HUB_RAYFIELD_ACTIVE = {
         table.clear(Runtime.connections)
         pcall(function() clearESP() end)
         pcall(function() ESPFolder:Destroy() end)
+        getgenv()._HUB_ASH_ACTIVE = nil
     end
 }
 
-Rayfield:Notify({
-    Title = "CleanHub",
-    Content = "โหลดแล้ว! กด F1 เพื่อเปิด/ปิดเมนู",
-    Duration = 4,
+GUI:CreateNotify({
+    title = "CleanHub",
+    description = "โหลดเสร็จแล้ว! กด K เพื่อเปิด/ปิดเมนู"
 })
