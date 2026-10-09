@@ -1,0 +1,1259 @@
+-- CleanHub - Rayfield Gen2 Edition (TH/EN/RU)
+
+-- ป้องกัน UI ซ้อนกัน
+if getgenv()._HUB_RAYFIELD_ACTIVE and type(getgenv()._HUB_RAYFIELD_ACTIVE.unload) == "function" then
+    pcall(getgenv()._HUB_RAYFIELD_ACTIVE.unload)
+    task.wait(0.15)
+end
+
+-- === บริการและยูทิลิตี้ ===
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local TweenService = game:GetService("TweenService")
+local Workspace = game:GetService("Workspace")
+local VirtualUser = game:GetService("VirtualUser")
+
+local player = Players.LocalPlayer or Players.PlayerAdded:Wait()
+local Camera = Workspace.CurrentCamera or Workspace:FindFirstChildOfClass("Camera")
+local isTouchDevice = UserInputService.TouchEnabled
+
+-- === Rayfield ===
+local Rayfield
+do
+    local ok, lib = pcall(function()
+        return loadstring(game:HttpGet("https://sirius.menu/gen2"))()
+    end)
+    if ok and type(lib) == "table" and type(lib.CreateWindow) == "function" then
+        Rayfield = lib
+    else
+        warn("[CleanHub] Rayfield Gen2 โหลดล้มเหลว: " .. tostring(lib))
+        return
+    end
+end
+
+-- === สถานะเริ่มต้น ===
+local states = {
+    language = "English",
+    menuKey = "F1",
+    watermark = true,
+    
+    -- โมดูลเกม
+    randomTPFarm = false,
+    autoSell = true,
+    flashVacuum = false,
+    instantMagnet = false,
+    playerESP = false,
+    antiGiant = false,
+    antiRagdoll = false,
+    fly = false,
+    noclip = false,
+    infJump = false,
+    autoRewards = false,
+    
+    -- สไลเดอร์
+    flySpeed = 60,
+    tpDelay = 0.05,
+}
+
+-- === Localization ===
+local LOCALIZATION = {
+    English = {
+        windowTitle = "CleanHub",
+        windowSubtitle = "Rayfield Gen2 Edition",
+        
+        tabFarm = "FARM",
+        tabMagnet = "MAGNET",
+        tabVisuals = "VISUALS",
+        tabCombat = "COMBAT",
+        tabMovement = "MOVEMENT",
+        tabRewards = "REWARDS",
+        tabSettings = "SETTINGS",
+        
+        secFarm = "MAP AUTO-FARM",
+        secSell = "AUTO-SELL CONTROLLER",
+        secMagnet = "COLLECTION SYSTEMS",
+        secVisuals = "RADAR & DETECTION",
+        secCombat = "DEFENSE & COMBAT",
+        secMove = "MOBILITY MODIFIERS",
+        secRewards = "DAILY & TIMED GIFTS",
+        secPrefs = "FRAMEWORK PREFERENCES",
+        
+        toggleRandomFarm = "Auto Farm",
+        toggleAutoSell = "Auto-Sell on Full Size",
+        btnForceSell = "Force Sell Now",
+        
+        toggleFlashVacuum = "Tp to Money",
+        toggleInstantMagnet = "Money Magnet",
+        btnSweepOnce = "1-Click Full Sweep",
+        
+        togglePlayerESP = "Player Size Radar (ESP)",
+        
+        toggleAntiRagdoll = "Anti-Ragdoll (No Fall)",
+        toggleAntiGiant = "Auto-Dodge Giants",
+        
+        toggleFly = "Flight Mode (Fly)",
+        toggleNoclip = "Wall Noclip",
+        toggleInfJump = "Infinite Jump",
+        sliderFlySpeed = "Flight Speed",
+        
+        toggleAutoRewards = "Auto-Claim Timed Rewards",
+        btnClaimAllNow = "Claim All Ready Rewards",
+        
+        langBtn = "Language",
+        btnViewChangelog = "View Changelog",
+        
+        statusSellSuccess = "Size sold successfully!",
+        statusRewardsClaimed = "Rewards claimed!",
+        espEdible = "EDIBLE",
+        espDanger = "DANGER!",
+        
+        langChanged = "Language: English",
+        farmStuckWarn = "Farm stuck! Restarting in 3s...",
+        farmResumed = "Auto-Farm resumed!",
+        sweepComplete = "Sweep complete! Gathered items.",
+    },
+    Thai = {
+        windowTitle = "CleanHub",
+        windowSubtitle = "รุ่น Rayfield Gen2",
+        
+        tabFarm = "ฟาร์ม",
+        tabMagnet = "แม่เหล็ก",
+        tabVisuals = "ภาพ",
+        tabCombat = "ต่อสู้",
+        tabMovement = "การเคลื่อนที่",
+        tabRewards = "รางวัล",
+        tabSettings = "ตั้งค่า",
+        
+        secFarm = "ฟาร์มแผนที่อัตโนมัติ",
+        secSell = "ควบคุมการขายอัตโนมัติ",
+        secMagnet = "ระบบเก็บของ",
+        secVisuals = "เรดาร์ & ตรวจจับ",
+        secCombat = "ป้องกัน & ต่อสู้",
+        secMove = "ปรับแต่งการเคลื่อนที่",
+        secRewards = "ของขวัญรายวัน & ตามเวลา",
+        secPrefs = "การตั้งค่าเฟรมเวิร์ก",
+        
+        toggleRandomFarm = "ฟาร์มอัตโนมัติ",
+        toggleAutoSell = "ขายอัตโนมัติเมื่อเต็ม",
+        btnForceSell = "บังคับขายเดี๋ยวนี้",
+        
+        toggleFlashVacuum = "วาร์ปไปหาเงิน",
+        toggleInstantMagnet = "แม่เหล็กเงิน",
+        btnSweepOnce = "เก็บเงินทั้งหมดในคลิกเดียว",
+        
+        togglePlayerESP = "เรดาร์ขนาดผู้เล่น (ESP)",
+        
+        toggleAntiRagdoll = "กันหุ่นล้ม (ไม่ล้ม)",
+        toggleAntiGiant = "หลบยักษ์อัตโนมัติ",
+        
+        toggleFly = "โหมดบิน (Fly)",
+        toggleNoclip = "ทะลุกำแพง (Noclip)",
+        toggleInfJump = "กระโดดไม่จำกัด",
+        sliderFlySpeed = "ความเร็วในการบิน",
+        
+        toggleAutoRewards = "รับรางวัลตามเวลาอัตโนมัติ",
+        btnClaimAllNow = "รับรางวัลทั้งหมดที่พร้อม",
+        
+        langBtn = "ภาษา",
+        btnViewChangelog = "ดูบันทึกการเปลี่ยนแปลง",
+        
+        statusSellSuccess = "ขายขนาดสำเร็จ!",
+        statusRewardsClaimed = "รับรางวัลแล้ว!",
+        espEdible = "กินได้",
+        espDanger = "อันตราย!",
+        
+        langChanged = "ภาษา: ไทย",
+        farmStuckWarn = "ฟาร์มค้าง! กำลังรีสตาร์ทใน 3 วิ...",
+        farmResumed = "ฟาร์มอัตโนมัติเริ่มใหม่แล้ว!",
+        sweepComplete = "กวาดเสร็จ! เก็บของแล้ว",
+    },
+    Russian = {
+        windowTitle = "CleanHub",
+        windowSubtitle = "Издание Rayfield Gen2",
+        
+        tabFarm = "ФАРМ",
+        tabMagnet = "МАГНИТ",
+        tabVisuals = "ВИЗУАЛ",
+        tabCombat = "БОЙ",
+        tabMovement = "ДВИЖЕНИЕ",
+        tabRewards = "НАГРАДЫ",
+        tabSettings = "НАСТРОЙКИ",
+        
+        secFarm = "АВТО-ФАРМ КАРТЫ",
+        secSell = "УПРАВЛЕНИЕ ПРОДАЖЕЙ",
+        secMagnet = "СИСТЕМЫ СБОРА",
+        secVisuals = "РАДАР И ОБНАРУЖЕНИЕ",
+        secCombat = "ЗАЩИТА И БОЙ",
+        secMove = "МОДИФИКАТОРЫ ДВИЖЕНИЯ",
+        secRewards = "ТАЙМЕРЫ И ПОДАРКИ",
+        secPrefs = "НАСТРОЙКИ ИНТЕРФЕЙСА",
+        
+        toggleRandomFarm = "Авто фарм",
+        toggleAutoSell = "Авто-Продажа при заполнении",
+        btnForceSell = "Продать размер сейчас",
+        
+        toggleFlashVacuum = "Тп к деньгам",
+        toggleInstantMagnet = "Магнит денег",
+        btnSweepOnce = "Собрать все деньги за 1 раз",
+        
+        togglePlayerESP = "ESP Игроков (Радар веса)",
+        
+        toggleAntiRagdoll = "Анти-Рэгдолл (Без падений)",
+        toggleAntiGiant = "Авто-Уклонение от гигантов",
+        
+        toggleFly = "Режим полета (Fly)",
+        toggleNoclip = "Проход сквозь стены (Noclip)",
+        toggleInfJump = "Бесконечный прыжок",
+        sliderFlySpeed = "Скорость полета",
+        
+        toggleAutoRewards = "Авто-Сбор наград таймера",
+        btnClaimAllNow = "Забрать все готовые награды",
+        
+        langBtn = "Язык",
+        btnViewChangelog = "Посмотреть Ченджлог",
+        
+        statusSellSuccess = "Размер успешно продан!",
+        statusRewardsClaimed = "Награды собраны!",
+        espEdible = "МОЖНО СЪЕСТЬ",
+        espDanger = "ОПАСНОСТЬ!",
+        
+        langChanged = "Язык: Русский",
+        farmStuckWarn = "Фарм завис! Перезапуск на 3 сек...",
+        farmResumed = "Авто-фарм перезапущен!",
+        sweepComplete = "Сбор завершен! Предметы собраны.",
+    }
+}
+
+local LANG_ORDER = { "English", "Thai", "Russian" }
+
+local function getText(key)
+    local lang = states.language or "English"
+    return (LOCALIZATION[lang] and LOCALIZATION[lang][key])
+        or (LOCALIZATION.English and LOCALIZATION.English[key])
+        or key
+end
+
+-- === ตัวละคร ===
+local Character = player.Character or player.CharacterAdded:Wait()
+local Humanoid = Character:WaitForChild("Humanoid")
+local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
+
+player.CharacterAdded:Connect(function(newChar)
+    Character = newChar
+    Humanoid = newChar:WaitForChild("Humanoid")
+    HumanoidRootPart = newChar:WaitForChild("HumanoidRootPart")
+end)
+
+-- === ฟังก์ชันเกม ===
+local function getCharEvents()
+    local char = player.Character
+    if not char then return nil end
+    local ev = char:FindFirstChild("Events")
+    if ev then
+        return {
+            Grab = ev:FindFirstChild("Grab"),
+            Eat = ev:FindFirstChild("Eat"),
+            Throw = ev:FindFirstChild("Throw"),
+            Sell = ev:FindFirstChild("Sell"),
+            ChunkLoaded = ev:FindFirstChild("ChunkLoaded")
+        }
+    end
+    return nil
+end
+
+local isFullServerFlag = false
+local function hookServerEatError()
+    local char = player.Character
+    if not char then return end
+    local ev = char:FindFirstChild("Events")
+    if ev and ev:FindFirstChild("Eat") then
+        ev.Eat.OnClientEvent:Connect(function()
+            isFullServerFlag = true
+        end)
+    end
+end
+hookServerEatError()
+player.CharacterAdded:Connect(function()
+    task.wait(1)
+    hookServerEatError()
+end)
+
+local function isInventoryFull()
+    if isFullServerFlag then return true end
+
+    local playerGui = player:FindFirstChild("PlayerGui")
+    local sellGui = playerGui and playerGui:FindFirstChild("ScreenGui") and playerGui.ScreenGui:FindFirstChild("Sell")
+    if sellGui then
+        local warn = sellGui:FindFirstChild("WarningText")
+        if warn and warn.Visible and warn.TextTransparency < 0.5 then return true end
+        local sellText = sellGui:FindFirstChild("SellText")
+        if sellText and sellText.Visible then return true end
+        local bar = sellGui:FindFirstChild("ProgressBar")
+        if bar and bar.Size.X.Scale >= 0.98 then return true end
+    end
+    return false
+end
+
+local function executeSell()
+    local events = getCharEvents()
+    if events and events.Sell then
+        events.Sell:FireServer()
+    end
+    local playerGui = player:FindFirstChild("PlayerGui")
+    local sellGui = playerGui and playerGui:FindFirstChild("ScreenGui") and playerGui.ScreenGui:FindFirstChild("Sell")
+    if sellGui then
+        local btn = sellGui:FindFirstChild("SellButton")
+        if btn and typeof(firesignal) == "function" then
+            firesignal(btn.Activated)
+            firesignal(btn.MouseButton1Click)
+        end
+    end
+    isFullServerFlag = false
+end
+
+local GROUND_KEYWORDS = {
+    "ground", "grass", "dirt", "soil", "sand", "floor", 
+    "road", "path", "terrain", "base", "plate", "mud", "earth"
+}
+
+local GROUND_MATERIALS = {
+    [Enum.Material.Grass] = true,
+    [Enum.Material.Ground] = true,
+    [Enum.Material.Mud] = true,
+    [Enum.Material.Sand] = true,
+    [Enum.Material.LeafyGrass] = true,
+    [Enum.Material.Cobblestone] = true,
+    [Enum.Material.Asphalt] = true,
+    [Enum.Material.Slate] = true
+}
+
+local function isGroundPart(part)
+    if not part or not part:IsA("BasePart") then return false end
+    if part.Material and GROUND_MATERIALS[part.Material] then return true end
+    local lowerName = string.lower(part.Name)
+    for _, keyword in ipairs(GROUND_KEYWORDS) do
+        if string.find(lowerName, keyword) then return true end
+    end
+    if part.Size.Y <= 5 and (part.Size.X >= 8 or part.Size.Z >= 8) then return true end
+    return false
+end
+
+local function getRandomEdiblePart()
+    local map = Workspace:FindFirstChild("Map")
+    if not map then return nil end
+    local allDescendants = map:GetDescendants()
+    if #allDescendants == 0 then return nil end
+
+    local char = player.Character
+    local rawSize = char and char:FindFirstChild("Size") and char.Size.Value or 1
+    local leaderSize = player:FindFirstChild("leaderstats") and player.leaderstats:FindFirstChild("Size") and player.leaderstats.Size.Value or rawSize
+    local currentSize = math.max(rawSize, leaderSize)
+    local prioritizeGround = (currentSize < 400)
+    local fallbackPart = nil
+
+    for _ = 1, 40 do
+        local randomObj = allDescendants[math.random(1, #allDescendants)]
+        if randomObj:IsA("BasePart")
+            and randomObj.Name ~= "Bedrock"
+            and randomObj.Name ~= "Barrier"
+            and randomObj.CanCollide
+            and randomObj.Transparency < 0.8
+            and randomObj.Size.Magnitude > 2.5
+            and randomObj.Position.Y > 0 then
+            if prioritizeGround then
+                if isGroundPart(randomObj) then return randomObj, true
+                elseif not fallbackPart then fallbackPart = randomObj end
+            else
+                return randomObj, false
+            end
+        end
+    end
+
+    if prioritizeGround then
+        for _, obj in ipairs(allDescendants) do
+            if obj:IsA("BasePart")
+                and obj.Name ~= "Bedrock"
+                and obj.Name ~= "Barrier"
+                and obj.CanCollide
+                and obj.Transparency < 0.8
+                and obj.Position.Y > 0
+                and isGroundPart(obj) then
+                return obj, true
+            end
+        end
+    end
+    return fallbackPart, false
+end
+
+local VALID_DROPS = {
+    ["Cube"] = true, ["Token"] = true, ["Candy"] = true,
+    ["Present"] = true, ["Ornament"] = true, ["Egg"] = true
+}
+
+local function canCollect(item)
+    if not item or not item:IsA("BasePart") or not item.Parent then return false end
+    if not VALID_DROPS[item.Name] then return false end
+    local owner = item:FindFirstChild("Owner")
+    local timeLeft = item:FindFirstChild("TimeLeft")
+    if owner and owner.Value ~= "" and owner.Value ~= player.Name then
+        if timeLeft and timeLeft.Value > 0 then return false end
+    end
+    return true
+end
+
+local function getPrioritizedDrops()
+    local drops = {}
+    local myPos = HumanoidRootPart.Position
+    for _, obj in ipairs(Workspace:GetChildren()) do
+        if canCollect(obj) then
+            local dist = (obj.Position - myPos).Magnitude
+            local timeLeftVal = obj:FindFirstChild("TimeLeft") and obj.TimeLeft.Value or 15
+            table.insert(drops, { Part = obj, Dist = dist, TimeLeft = timeLeftVal })
+        end
+    end
+    table.sort(drops, function(a, b)
+        if a.TimeLeft <= 4 and b.TimeLeft > 4 then return true
+        elseif b.TimeLeft <= 4 and a.TimeLeft > 4 then return false end
+        return a.Dist < b.Dist
+    end)
+    return drops
+end
+
+local function claimTimedRewards()
+    local playerGui = player:FindFirstChild("PlayerGui")
+    local rewardsGui = playerGui and playerGui:FindFirstChild("ScreenGui") and playerGui.ScreenGui:FindFirstChild("Rewards")
+    if rewardsGui then
+        local grid = rewardsGui:FindFirstChild("TimedRewards") and rewardsGui.TimedRewards:FindFirstChild("RewardGrid")
+        if grid then
+            for _, btn in ipairs(grid:GetChildren()) do
+                if btn:IsA("ImageButton") or btn:IsA("TextButton") then
+                    local timeLbl = btn:FindFirstChild("Time") or btn:FindFirstChildWhichIsA("TextLabel")
+                    if timeLbl then
+                        local txt = string.upper(timeLbl.Text)
+                        if txt == "CLAIM" or txt == "00:00" or txt == "0:00" or not string.find(txt, ":") then
+                            if typeof(firesignal) == "function" then
+                                firesignal(btn.Activated)
+                                firesignal(btn.MouseButton1Click)
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    local timedFolder = player:FindFirstChild("TimedRewards")
+    local rewardRemote = ReplicatedStorage:FindFirstChild("Events") and ReplicatedStorage.Events:FindFirstChild("RewardEvent")
+    if timedFolder and rewardRemote then
+        local now = os.time()
+        for idx, val in ipairs(timedFolder:GetChildren()) do
+            if (val:IsA("IntValue") or val:IsA("NumberValue")) and now >= val.Value then
+                rewardRemote:FireServer(idx)
+                rewardRemote:FireServer(val.Name)
+            end
+        end
+    end
+
+    local spinRemote = ReplicatedStorage:FindFirstChild("Events") and ReplicatedStorage.Events:FindFirstChild("SpinEvent")
+    if spinRemote then spinRemote:FireServer() end
+end
+
+-- ====================================================================
+--                         สร้าง Rayfield Window
+-- ====================================================================
+local Window = Rayfield:CreateWindow({
+    name = getText("windowTitle"),
+    subtitle = getText("windowSubtitle"),
+    sidebarLayout = true,
+    theme = "default",
+    configuration = {
+        autoSave = false,
+        autoLoad = false,
+    },
+})
+
+-- เก็บ element ไว้สำหรับเปลี่ยนภาษา
+local L = {
+    tabs = {},
+    dividers = {},
+    toggles = {},
+    sliders = {},
+    buttons = {},
+    labels = {},
+}
+
+-- === ฟังก์ชันรีเฟรชภาษา ===
+local function refreshLanguage()
+    -- แท็บ
+    for _, item in ipairs(L.tabs) do
+        pcall(function() item.obj:SetName(getText(item.key)) end)
+    end
+    -- Divider
+    for _, item in ipairs(L.dividers) do
+        pcall(function() item.obj:Set(getText(item.key)) end)
+    end
+    -- Toggle
+    for _, item in ipairs(L.toggles) do
+        pcall(function() item.obj:SetName(getText(item.key)) end)
+    end
+    -- Slider
+    for _, item in ipairs(L.sliders) do
+        pcall(function() item.obj:SetName(getText(item.key)) end)
+    end
+    -- Button
+    for _, item in ipairs(L.buttons) do
+        pcall(function() item.obj:SetName(getText(item.key)) end)
+    end
+    -- Label
+    for _, item in ipairs(L.labels) do
+        pcall(function() item.obj:Set(getText(item.key)) end)
+    end
+end
+
+-- ====================================================================
+--                            แท็บทั้ง 7
+-- ====================================================================
+local tabFarm = Window:CreateTab({ name = getText("tabFarm"), icon = "wheat" })
+local tabMagnet = Window:CreateTab({ name = getText("tabMagnet"), icon = "magnet" })
+local tabVisuals = Window:CreateTab({ name = getText("tabVisuals"), icon = "eye" })
+local tabCombat = Window:CreateTab({ name = getText("tabCombat"), icon = "shield" })
+local tabMovement = Window:CreateTab({ name = getText("tabMovement"), icon = "move" })
+local tabRewards = Window:CreateTab({ name = getText("tabRewards"), icon = "gift" })
+local tabSettings = Window:CreateTab({ name = getText("tabSettings"), icon = "settings" })
+
+L.tabs = {
+    {obj = tabFarm, key = "tabFarm"},
+    {obj = tabMagnet, key = "tabMagnet"},
+    {obj = tabVisuals, key = "tabVisuals"},
+    {obj = tabCombat, key = "tabCombat"},
+    {obj = tabMovement, key = "tabMovement"},
+    {obj = tabRewards, key = "tabRewards"},
+    {obj = tabSettings, key = "tabSettings"},
+}
+
+-- ====================================================================
+--                            1. แท็บฟาร์ม
+-- ====================================================================
+local divFarm = tabFarm:CreateDivider({ text = getText("secFarm") })
+L.dividers[#L.dividers+1] = {obj = divFarm, key = "secFarm"}
+
+local toggleFarm = tabFarm:CreateToggle({
+    name = getText("toggleRandomFarm"),
+    value = false,
+    callback = function(val)
+        states.randomTPFarm = val
+        Rayfield:Notify({
+            Title = getText("toggleRandomFarm"),
+            Content = val and "ON" or "OFF",
+            Duration = 2,
+        })
+    end,
+})
+L.toggles[#L.toggles+1] = {obj = toggleFarm, key = "toggleRandomFarm"}
+
+local divSell = tabFarm:CreateDivider({ text = getText("secSell") })
+L.dividers[#L.dividers+1] = {obj = divSell, key = "secSell"}
+
+local toggleSell = tabFarm:CreateToggle({
+    name = getText("toggleAutoSell"),
+    value = true,
+    callback = function(val)
+        states.autoSell = val
+        Rayfield:Notify({
+            Title = getText("toggleAutoSell"),
+            Content = val and "ON" or "OFF",
+            Duration = 2,
+        })
+    end,
+})
+L.toggles[#L.toggles+1] = {obj = toggleSell, key = "toggleAutoSell"}
+
+local btnSell = tabFarm:CreateButton({
+    name = getText("btnForceSell"),
+    callback = function()
+        executeSell()
+        Rayfield:Notify({
+            Title = getText("statusSellSuccess"),
+            Content = "",
+            Duration = 2,
+        })
+    end,
+})
+L.buttons[#L.buttons+1] = {obj = btnSell, key = "btnForceSell"}
+
+-- ====================================================================
+--                            2. แท็บแม่เหล็ก
+-- ====================================================================
+local divMag = tabMagnet:CreateDivider({ text = getText("secMagnet") })
+L.dividers[#L.dividers+1] = {obj = divMag, key = "secMagnet"}
+
+local toggleVacuum = tabMagnet:CreateToggle({
+    name = getText("toggleFlashVacuum"),
+    value = false,
+    callback = function(val)
+        states.flashVacuum = val
+        Rayfield:Notify({
+            Title = getText("toggleFlashVacuum"),
+            Content = val and "ON" or "OFF",
+            Duration = 2,
+        })
+    end,
+})
+L.toggles[#L.toggles+1] = {obj = toggleVacuum, key = "toggleFlashVacuum"}
+
+local toggleMag = tabMagnet:CreateToggle({
+    name = getText("toggleInstantMagnet"),
+    value = false,
+    callback = function(val)
+        states.instantMagnet = val
+        Rayfield:Notify({
+            Title = getText("toggleInstantMagnet"),
+            Content = val and "ON" or "OFF",
+            Duration = 2,
+        })
+    end,
+})
+L.toggles[#L.toggles+1] = {obj = toggleMag, key = "toggleInstantMagnet"}
+
+local btnSweep = tabMagnet:CreateButton({
+    name = getText("btnSweepOnce"),
+    callback = function()
+        task.spawn(function()
+            local dropsList = getPrioritizedDrops()
+            if #dropsList > 0 and HumanoidRootPart then
+                local startCF = HumanoidRootPart.CFrame
+                for _, itemData in ipairs(dropsList) do
+                    local itemPart = itemData.Part
+                    if itemPart and itemPart.Parent and canCollect(itemPart) then
+                        HumanoidRootPart.CFrame = itemPart.CFrame * CFrame.new(0, 0.4, 0)
+                        HumanoidRootPart.AssemblyLinearVelocity = Vector3.new(0, 0.1, 0)
+                        if typeof(firetouchinterest) == "function" then
+                            firetouchinterest(HumanoidRootPart, itemPart, 0)
+                            firetouchinterest(HumanoidRootPart, itemPart, 1)
+                        end
+                        RunService.Heartbeat:Wait()
+                    end
+                end
+                HumanoidRootPart.CFrame = startCF
+                HumanoidRootPart.AssemblyLinearVelocity = Vector3.zero
+                Rayfield:Notify({
+                    Title = getText("sweepComplete"),
+                    Content = "",
+                    Duration = 2,
+                })
+            end
+        end)
+    end,
+})
+L.buttons[#L.buttons+1] = {obj = btnSweep, key = "btnSweepOnce"}
+
+-- ====================================================================
+--                            3. แท็บภาพ
+-- ====================================================================
+local divVis = tabVisuals:CreateDivider({ text = getText("secVisuals") })
+L.dividers[#L.dividers+1] = {obj = divVis, key = "secVisuals"}
+
+local toggleESP = tabVisuals:CreateToggle({
+    name = getText("togglePlayerESP"),
+    value = false,
+    callback = function(val)
+        states.playerESP = val
+        Rayfield:Notify({
+            Title = getText("togglePlayerESP"),
+            Content = val and "ON" or "OFF",
+            Duration = 2,
+        })
+    end,
+})
+L.toggles[#L.toggles+1] = {obj = toggleESP, key = "togglePlayerESP"}
+
+-- ====================================================================
+--                            4. แท็บต่อสู้
+-- ====================================================================
+local divCom = tabCombat:CreateDivider({ text = getText("secCombat") })
+L.dividers[#L.dividers+1] = {obj = divCom, key = "secCombat"}
+
+local toggleRagdoll = tabCombat:CreateToggle({
+    name = getText("toggleAntiRagdoll"),
+    value = false,
+    callback = function(val)
+        states.antiRagdoll = val
+        Rayfield:Notify({
+            Title = getText("toggleAntiRagdoll"),
+            Content = val and "ON" or "OFF",
+            Duration = 2,
+        })
+    end,
+})
+L.toggles[#L.toggles+1] = {obj = toggleRagdoll, key = "toggleAntiRagdoll"}
+
+local toggleGiant = tabCombat:CreateToggle({
+    name = getText("toggleAntiGiant"),
+    value = false,
+    callback = function(val)
+        states.antiGiant = val
+        Rayfield:Notify({
+            Title = getText("toggleAntiGiant"),
+            Content = val and "ON" or "OFF",
+            Duration = 2,
+        })
+    end,
+})
+L.toggles[#L.toggles+1] = {obj = toggleGiant, key = "toggleAntiGiant"}
+
+-- ====================================================================
+--                            5. แท็บการเคลื่อนที่
+-- ====================================================================
+local divMove = tabMovement:CreateDivider({ text = getText("secMove") })
+L.dividers[#L.dividers+1] = {obj = divMove, key = "secMove"}
+
+local toggleFly = tabMovement:CreateToggle({
+    name = getText("toggleFly"),
+    value = false,
+    callback = function(val)
+        states.fly = val
+        Rayfield:Notify({
+            Title = getText("toggleFly"),
+            Content = val and "ON" or "OFF",
+            Duration = 2,
+        })
+    end,
+})
+L.toggles[#L.toggles+1] = {obj = toggleFly, key = "toggleFly"}
+
+local toggleNoclip = tabMovement:CreateToggle({
+    name = getText("toggleNoclip"),
+    value = false,
+    callback = function(val)
+        states.noclip = val
+        Rayfield:Notify({
+            Title = getText("toggleNoclip"),
+            Content = val and "ON" or "OFF",
+            Duration = 2,
+        })
+    end,
+})
+L.toggles[#L.toggles+1] = {obj = toggleNoclip, key = "toggleNoclip"}
+
+local toggleJump = tabMovement:CreateToggle({
+    name = getText("toggleInfJump"),
+    value = false,
+    callback = function(val)
+        states.infJump = val
+        Rayfield:Notify({
+            Title = getText("toggleInfJump"),
+            Content = val and "ON" or "OFF",
+            Duration = 2,
+        })
+    end,
+})
+L.toggles[#L.toggles+1] = {obj = toggleJump, key = "toggleInfJump"}
+
+local sliderSpeed = tabMovement:CreateSlider({
+    name = getText("sliderFlySpeed"),
+    range = { 16, 200 },
+    increment = 2,
+    value = 60,
+    suffix = "",
+    callback = function(val)
+        states.flySpeed = val
+    end,
+})
+L.sliders[#L.sliders+1] = {obj = sliderSpeed, key = "sliderFlySpeed"}
+
+-- ====================================================================
+--                            6. แท็บรางวัล
+-- ====================================================================
+local divRew = tabRewards:CreateDivider({ text = getText("secRewards") })
+L.dividers[#L.dividers+1] = {obj = divRew, key = "secRewards"}
+
+local toggleRewards = tabRewards:CreateToggle({
+    name = getText("toggleAutoRewards"),
+    value = false,
+    callback = function(val)
+        states.autoRewards = val
+        Rayfield:Notify({
+            Title = getText("toggleAutoRewards"),
+            Content = val and "ON" or "OFF",
+            Duration = 2,
+        })
+    end,
+})
+L.toggles[#L.toggles+1] = {obj = toggleRewards, key = "toggleAutoRewards"}
+
+local btnClaim = tabRewards:CreateButton({
+    name = getText("btnClaimAllNow"),
+    callback = function()
+        claimTimedRewards()
+        Rayfield:Notify({
+            Title = getText("statusRewardsClaimed"),
+            Content = "",
+            Duration = 2,
+        })
+    end,
+})
+L.buttons[#L.buttons+1] = {obj = btnClaim, key = "btnClaimAllNow"}
+
+-- ====================================================================
+--                            7. แท็บตั้งค่า
+-- ====================================================================
+local divPrefs = tabSettings:CreateDivider({ text = getText("secPrefs") })
+L.dividers[#L.dividers+1] = {obj = divPrefs, key = "secPrefs"}
+
+-- ปุ่มเปลี่ยนภาษา (วน 3 ภาษา)
+local langDropdown = tabSettings:CreateDropdown({
+    name = getText("langBtn"),
+    options = { "English", "ไทย", "Русский" },
+    currentOption = { "English" },
+    callback = function(opt)
+        local val = type(opt) == "table" and opt[1] or opt
+        if val == "ไทย" then states.language = "Thai"
+        elseif val == "Русский" then states.language = "Russian"
+        else states.language = "English" end
+        refreshLanguage()
+        Rayfield:Notify({
+            Title = getText("langChanged"),
+            Content = "",
+            Duration = 2,
+        })
+    end,
+})
+
+local btnChangelog = tabSettings:CreateButton({
+    name = getText("btnViewChangelog"),
+    callback = function()
+        Rayfield:Notify({
+            Title = "v5.0 Master",
+            Content = "• ลบ auto-purchase ตามคำขอ\n• Flash Vacuum จัดลำดับ TimeLeft\n• แก้ timed reward + lucky wheel\n• Random TP หันหน้าเป้าหมายก่อนเก็บ\n• Auto-Sell sync กับ WarningText\n• รองรับ 3 ภาษา (EN/TH/RU)",
+            Duration = 8,
+        })
+    end,
+})
+L.buttons[#L.buttons+1] = {obj = btnChangelog, key = "btnViewChangelog"}
+
+-- Keybind เปิด/ปิดเมนู
+local keybind = tabSettings:CreateKeybind({
+    name = "Menu Keybind",
+    currentKeybind = "F1",
+    holdToInteract = false,
+    callback = function(key)
+        states.menuKey = key
+    end,
+})
+
+-- ====================================================================
+--                        เธรดพื้นหลัง
+-- ====================================================================
+local Runtime = { running = true, connections = {} }
+local function addConn(c) table.insert(Runtime.connections, c) end
+
+-- 1. Random TP Auto-Farm + Watchdog
+task.spawn(function()
+    local localGrab = ReplicatedStorage:WaitForChild("LocalEvents"):WaitForChild("Grab")
+    local localEat = ReplicatedStorage:WaitForChild("LocalEvents"):WaitForChild("Eat")
+
+    local lastActivityTime = os.clock()
+    local wasFarming = false
+
+    while Runtime.running do
+        if states.randomTPFarm then
+            if not wasFarming then
+                wasFarming = true
+                lastActivityTime = os.clock()
+            end
+
+            if os.clock() - lastActivityTime >= 10 then
+                Rayfield:Notify({
+                    Title = getText("farmStuckWarn"),
+                    Content = "",
+                    Duration = 3,
+                })
+                states.randomTPFarm = false
+                pcall(function() toggleFarm:Set(false) end)
+
+                local char = player.Character
+                if char then
+                    local hrp = char:FindFirstChild("HumanoidRootPart")
+                    local hum = char:FindFirstChild("Humanoid")
+                    if hrp then
+                        hrp.Anchored = false
+                        hrp.AssemblyLinearVelocity = Vector3.zero
+                    end
+                    if hum then hum:ChangeState(Enum.HumanoidStateType.Running) end
+                end
+
+                task.wait(3.0)
+
+                if Runtime.running then
+                    states.randomTPFarm = true
+                    pcall(function() toggleFarm:Set(true) end)
+                    lastActivityTime = os.clock()
+                    Rayfield:Notify({
+                        Title = getText("farmResumed"),
+                        Content = "",
+                        Duration = 3,
+                    })
+                end
+            end
+
+            local char = player.Character
+            if char and char:FindFirstChild("HumanoidRootPart") and char:FindFirstChild("Humanoid") then
+                local hrp = char.HumanoidRootPart
+                local hum = char.Humanoid
+                local currentChunkVal = char:FindFirstChild("CurrentChunk")
+                local events = getCharEvents()
+
+                if hum.Health > 0 and currentChunkVal and events then
+                    hum:ChangeState(Enum.HumanoidStateType.Running)
+
+                    if states.autoSell and isInventoryFull() then
+                        if currentChunkVal.Value ~= nil then
+                            if events.ChunkLoaded then events.ChunkLoaded:FireServer(currentChunkVal.Value) end
+                            events.Eat:FireServer()
+                            local wEat = os.clock()
+                            while currentChunkVal.Value ~= nil and (os.clock() - wEat) < 0.3 do
+                                task.wait(0.02)
+                            end
+                        end
+                        executeSell()
+                        lastActivityTime = os.clock()
+                        local wReset = os.clock()
+                        while isInventoryFull() and (os.clock() - wReset) < 1.2 do task.wait(0.05) end
+                        task.wait(0.1)
+                    end
+
+                    local targetPart, isGround = getRandomEdiblePart()
+                    if targetPart and targetPart.Parent then
+                        local partPos = targetPart.Position
+                        local standPos, lookTarget
+                        if isGround then
+                            standPos = partPos + Vector3.new(math.random(-1, 1), hum.HipHeight + 0.2, math.random(-1, 1))
+                            lookTarget = partPos - Vector3.new(0, 2, 0)
+                        else
+                            standPos = partPos + Vector3.new(0, hum.HipHeight + 0.5, 2.5)
+                            lookTarget = Vector3.new(partPos.X, standPos.Y, partPos.Z)
+                        end
+                        hrp.CFrame = CFrame.new(standPos, lookTarget)
+                        hrp.AssemblyLinearVelocity = Vector3.zero
+                        hrp.AssemblyAngularVelocity = Vector3.zero
+                        task.wait(states.tpDelay)
+
+                        if currentChunkVal.Value == nil then
+                            localGrab:Fire()
+                            local grabTimeout = os.clock()
+                            while currentChunkVal.Value == nil and (os.clock() - grabTimeout) < 0.35 do task.wait(0.02) end
+                            if currentChunkVal.Value == nil and events.Grab then
+                                events.Grab:FireServer(false, false, false)
+                                task.wait(0.05)
+                            end
+                        end
+
+                        local held = currentChunkVal.Value
+                        if held and held.Parent then
+                            lastActivityTime = os.clock()
+                            if events.ChunkLoaded then events.ChunkLoaded:FireServer(held) end
+                            task.wait(0.02)
+                            localEat:Fire()
+                            local eatTimeout = os.clock()
+                            while currentChunkVal.Value ~= nil and (os.clock() - eatTimeout) < 0.35 do task.wait(0.02) end
+                            lastActivityTime = os.clock()
+                        end
+
+                        local anchorTimeout = os.clock()
+                        while hrp.Anchored and (os.clock() - anchorTimeout) < 0.25 do task.wait(0.02) end
+                    else
+                        task.wait(0.1)
+                    end
+                end
+            end
+        else
+            wasFarming = false
+        end
+        task.wait(0.02)
+    end
+end)
+
+-- 2. Flash Vacuum
+task.spawn(function()
+    while Runtime.running do
+        if states.flashVacuum then
+            local char = player.Character
+            if char and char:FindFirstChild("HumanoidRootPart") and char:FindFirstChild("Humanoid") then
+                local hrp = char.HumanoidRootPart
+                local hum = char.Humanoid
+                if hum.Health > 0 then
+                    local dropsList = getPrioritizedDrops()
+                    if #dropsList > 0 then
+                        local startCF = hrp.CFrame
+                        for _, itemData in ipairs(dropsList) do
+                            if not states.flashVacuum then break end
+                            local itemPart = itemData.Part
+                            if itemPart and itemPart.Parent and canCollect(itemPart) then
+                                hrp.CFrame = itemPart.CFrame * CFrame.new(0, 0.4, 0)
+                                hrp.AssemblyLinearVelocity = Vector3.new(0, 0.1, 0)
+                                if typeof(firetouchinterest) == "function" then
+                                    firetouchinterest(hrp, itemPart, 0)
+                                    firetouchinterest(hrp, itemPart, 1)
+                                end
+                                RunService.Heartbeat:Wait()
+                            end
+                        end
+                        hrp.CFrame = startCF
+                        hrp.AssemblyLinearVelocity = Vector3.zero
+                    end
+                end
+            end
+        end
+        task.wait(0.2)
+    end
+end)
+
+-- 3. Passive Touch Magnet
+task.spawn(function()
+    while Runtime.running do
+        if states.instantMagnet then
+            local char = player.Character
+            local hrp = char and char:FindFirstChild("HumanoidRootPart")
+            if hrp then
+                for _, obj in ipairs(Workspace:GetChildren()) do
+                    if canCollect(obj) then
+                        if typeof(firetouchinterest) == "function" then
+                            firetouchinterest(hrp, obj, 0)
+                            firetouchinterest(hrp, obj, 1)
+                        end
+                    end
+                end
+            end
+        end
+        task.wait(0.08)
+    end
+end)
+
+-- 4. Auto Rewards
+task.spawn(function()
+    while Runtime.running do
+        if states.autoRewards then claimTimedRewards() end
+        task.wait(3.0)
+    end
+end)
+
+-- 5. Anti-Ragdoll
+task.spawn(function()
+    while Runtime.running do
+        if states.antiRagdoll then
+            local char = player.Character
+            if char then
+                local canRag = char:FindFirstChild("CanRagdoll")
+                if canRag then canRag.Value = false end
+                local lowerTorso = char:FindFirstChild("LowerTorso")
+                if lowerTorso then
+                    for _, desc in ipairs(lowerTorso:GetChildren()) do
+                        if desc:IsA("BallSocketConstraint") then desc:Destroy() end
+                    end
+                end
+                local hum = char:FindFirstChild("Humanoid")
+                if hum and hum.PlatformStand then
+                    hum.PlatformStand = false
+                    hum:ChangeState(Enum.HumanoidStateType.GettingUp)
+                end
+            end
+        end
+        task.wait(0.1)
+    end
+end)
+
+-- 6. Auto-Dodge Giants
+task.spawn(function()
+    while Runtime.running do
+        if states.antiGiant then
+            local char = player.Character
+            local hrp = char and char:FindFirstChild("HumanoidRootPart")
+            if char and hrp then
+                local myPhys = char:FindFirstChild("PhysicalSize") and char.PhysicalSize.Value or 1
+                for _, p in ipairs(Players:GetPlayers()) do
+                    if p ~= player and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+                        local otherChar = p.Character
+                        local otherPhys = otherChar:FindFirstChild("PhysicalSize") and otherChar.PhysicalSize.Value or 1
+                        if otherPhys > myPhys then
+                            local dist = (otherChar.HumanoidRootPart.Position - hrp.Position).Magnitude
+                            if dist < 30 then
+                                local fleeDir = (hrp.Position - otherChar.HumanoidRootPart.Position).Unit
+                                hrp.CFrame = hrp.CFrame + (fleeDir * 25) + Vector3.new(0, 35, 0)
+                                break
+                            end
+                        end
+                    end
+                end
+            end
+        end
+        task.wait(0.15)
+    end
+end)
+
+-- 7. Player ESP
+local ESPFolder = Instance.new("Folder")
+ESPFolder.Name = "AdminESPFolder"
+ESPFolder.Parent = game:GetService("CoreGui")
+
+local function clearESP() ESPFolder:ClearAllChildren() end
+
+task.spawn(function()
+    while Runtime.running do
+        if states.playerESP then
+            clearESP()
+            local myChar = player.Character
+            local myPhys = myChar and myChar:FindFirstChild("PhysicalSize") and myChar.PhysicalSize.Value or 1
+
+            for _, p in ipairs(Players:GetPlayers()) do
+                if p ~= player and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+                    local targetChar = p.Character
+                    local targetHum = targetChar:FindFirstChild("Humanoid")
+                    local targetPhys = targetChar:FindFirstChild("PhysicalSize") and targetChar.PhysicalSize.Value or 1
+                    if targetHum and targetHum.Health > 0 then
+                        local bg = Instance.new("BillboardGui")
+                        bg.Name = p.Name .. "_ESP"
+                        bg.Adornee = targetChar.HumanoidRootPart
+                        bg.Size = UDim2.new(0, 100, 0, 30)
+                        bg.AlwaysOnTop = true
+                        bg.Parent = ESPFolder
+
+                        local txt = Instance.new("TextLabel")
+                        txt.Size = UDim2.new(1, 0, 1, 0)
+                        txt.BackgroundTransparency = 1
+                        txt.Font = Enum.Font.GothamBold
+                        txt.TextSize = 11
+                        if targetPhys < myPhys then
+                            txt.TextColor3 = Color3.fromRGB(0, 255, 120)
+                            txt.Text = p.Name .. " [" .. getText("espEdible") .. "]\nน้ำหนัก: " .. math.floor(targetPhys * 10) / 10
+                        else
+                            txt.TextColor3 = Color3.fromRGB(255, 60, 60)
+                            txt.Text = p.Name .. " [" .. getText("espDanger") .. "]\nน้ำหนัก: " .. math.floor(targetPhys * 10) / 10
+                        end
+                        txt.Parent = bg
+                    end
+                end
+            end
+        else
+            clearESP()
+        end
+        task.wait(0.5)
+    end
+    clearESP()
+end)
+
+-- 8. Fly
+local flyBV, flyBG = nil, nil
+task.spawn(function()
+    while Runtime.running do
+        local char = player.Character
+        local hrp = char and char:FindFirstChild("HumanoidRootPart")
+        local hum = char and char:FindFirstChild("Humanoid")
+
+        if states.fly and hrp and hum and hum.Health > 0 then
+            hum.PlatformStand = true
+            if not flyBV or flyBV.Parent ~= hrp then
+                flyBV = Instance.new("BodyVelocity")
+                flyBV.Name = "AdminFlyBV"
+                flyBV.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+                flyBV.Velocity = Vector3.zero
+                flyBV.Parent = hrp
+
+                flyBG = Instance.new("BodyGyro")
+                flyBG.Name = "AdminFlyBG"
+                flyBG.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+                flyBG.P = 50000
+                flyBG.D = 500
+                flyBG.CFrame = hrp.CFrame
+                flyBG.Parent = hrp
+            end
+
+            local cam = Workspace.CurrentCamera or Camera
+            local camCF = cam.CFrame
+            local worldMove = hum.MoveDirection
+            local localMove = camCF:VectorToObjectSpace(worldMove)
+            local targetVelocity = Vector3.zero
+
+            if worldMove.Magnitude > 0 then
+                local forwardFly = camCF.LookVector * (-localMove.Z)
+                local strafeFly = camCF.RightVector * (localMove.X)
+                targetVelocity = (forwardFly + strafeFly).Unit * states.flySpeed
+            end
+
+            if not isTouchDevice then
+                if UserInputService:IsKeyDown(Enum.KeyCode.Space) then
+                    targetVelocity = targetVelocity + Vector3.new(0, states.flySpeed, 0)
+                end
+                if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) or UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then
+                    targetVelocity = targetVelocity - Vector3.new(0, states.flySpeed, 0)
+                end
+            else
+                if hum.Jump then
+                    targetVelocity = targetVelocity + Vector3.new(0, states.flySpeed * 0.8, 0)
+                end
+            end
+
+            flyBV.Velocity = targetVelocity
+            flyBG.CFrame = camCF
+        else
+            if flyBV then flyBV:Destroy(); flyBV = nil end
+            if flyBG then flyBG:Destroy(); flyBG = nil end
+            if hum and hum.PlatformStand then
+                hum.PlatformStand = false
+                hum:ChangeState(Enum.HumanoidStateType.GettingUp)
+            end
+        end
+        task.wait()
+    end
+    if flyBV then flyBV:Destroy() end
+    if flyBG then flyBG:Destroy() end
+end)
+
+-- 9. Noclip
+addConn(RunService.Stepped:Connect(function()
+    if states.noclip and player.Character then
+        for _, part in ipairs(player.Character:GetDescendants()) do
+            if part:IsA("BasePart") and part.CanCollide then
+                part.CanCollide = false
+            end
+        end
+    end
+end))
+
+-- 10. Infinite Jump
+addConn(UserInputService.JumpRequest:Connect(function()
+    if states.infJump and player.Character then
+        local hum = player.Character:FindFirstChild("Humanoid")
+        if hum then hum:ChangeState(Enum.HumanoidStateType.Jumping) end
+    end
+end))
+
+-- 11. Anti-AFK
+addConn(player.Idled:Connect(function()
+    pcall(function()
+        VirtualUser:CaptureController()
+        VirtualUser:ClickButton2(Vector2.new())
+    end)
+end))
+
+-- ====================================================================
+--                            Unload
+-- ====================================================================
+getgenv()._HUB_RAYFIELD_ACTIVE = {
+    unload = function()
+        Runtime.running = false
+        for _, c in ipairs(Runtime.connections) do
+            if c.Connected then c:Disconnect() end
+        end
+        table.clear(Runtime.connections)
+        pcall(function() clearESP() end)
+        pcall(function() ESPFolder:Destroy() end)
+    end
+}
+
+Rayfield:Notify({
+    Title = getText("windowTitle"),
+    Content = "โหลดแล้ว! กด " .. states.menuKey .. " เพื่อเปิด/ปิดเมนู",
+    Duration = 4,
+})
